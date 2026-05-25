@@ -1,4 +1,4 @@
-// api/_ton-utils.js
+// _ton-utils.js
 // Internal TON helper — NOT exposed as an endpoint (prefixed with _)
 // Sends TON from the house wallet to a recipient address
 
