@@ -1,0 +1,16 @@
+{
+  "name": "goldboxduel",
+  "version": "1.0.0",
+  "description": "Gold Box Duel — Telegram Mini App with TON wagering",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@vercel/kv": "^1.0.0",
+    "node-telegram-bot-api": "^0.64.0",
+    "@ton/ton": "^13.9.0",
+    "@ton/crypto": "^3.2.0",
+    "@ton/core": "^0.56.3"
+  }
+}
