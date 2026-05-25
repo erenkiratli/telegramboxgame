@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>Gold Box Duel</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Crimson+Pro:wght@400;600&display=swap');
+:root{
+  --bg:#0a0a10;--surface:#11111c;--surface2:#17172a;
+  --gold:#f5c842;--gold2:#ffe57a;--gold-glow:#f5c84244;--gold-dark:#a07820;
+  --p1:#e05c5c;--p2:#5ca8e0;--p1g:#e05c5c44;--p2g:#5ca8e044;
+  --ton:#0098ea;--tong:#0098ea44;
+  --text:#e8e4d8;--muted:#6a6a8a;--border:#22223a;--border2:#2e2e4a;
+  --green:#4caf82;--greeng:#4caf8244;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;min-height:100vh;background:var(--bg);color:var(--text);
+  font-family:'Crimson Pro',Georgia,serif;overflow-x:hidden;overscroll-behavior:none;
+  user-select:none;-webkit-tap-highlight-color:transparent;}
+body{display:flex;flex-direction:column;align-items:center;
+  background:radial-gradient(ellipse at 15% 0%,#1a1020 0%,transparent 50%),
+    radial-gradient(ellipse at 85% 100%,#0d1525 0%,transparent 50%),var(--bg);}
+
+.screen{display:none;flex-direction:column;align-items:center;width:100%;min-height:100vh;padding:0 16px 24px;}
+.screen.active{display:flex;}
+
+/* HEADER */
+.hdr{width:100%;text-align:center;padding:22px 0 14px;}
+.logo{font-family:'Cinzel Decorative',serif;font-size:20px;font-weight:900;letter-spacing:2px;
+  background:linear-gradient(135deg,var(--gold) 0%,#fff8d6 50%,var(--gold-dark) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 10px var(--gold-glow));}
+.logo-sub{font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:3px;}
+
+/* ── CONNECT ── */
+.connect-card{width:100%;max-width:360px;background:var(--surface);border:1px solid var(--border2);
+  border-radius:24px;padding:32px 24px 28px;display:flex;flex-direction:column;align-items:center;gap:18px;}
+.ton-logo{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#0070b8,#00b4ea);
+  display:flex;align-items:center;justify-content:center;font-size:36px;box-shadow:0 0 28px var(--tong);}
+.connect-title{font-family:'Cinzel Decorative',serif;font-size:18px;color:var(--text);text-align:center;}
+.connect-desc{font-size:13px;color:var(--muted);text-align:center;line-height:1.6;max-width:260px;}
+.connect-note{font-size:10px;color:var(--muted);text-align:center;letter-spacing:.5px;}
+
+/* BUTTONS */
+.btn-ton{width:100%;padding:15px;border-radius:14px;border:none;
+  background:linear-gradient(135deg,#0070b8,#00b4ea);color:#fff;
+  font-family:'Cinzel Decorative',serif;font-size:13px;font-weight:700;letter-spacing:1px;
+  cursor:pointer;transition:filter .2s,transform .15s;box-shadow:0 4px 20px var(--tong);}
+.btn-ton:hover{filter:brightness(1.1);}
+.btn-ton:active{transform:scale(.97);}
+.btn-gold{width:100%;padding:14px;border-radius:14px;border:none;
+  background:linear-gradient(135deg,var(--gold-dark),var(--gold));
+  color:#1a1000;font-family:'Cinzel Decorative',serif;font-size:13px;font-weight:700;letter-spacing:1px;
+  cursor:pointer;transition:filter .2s,transform .15s;box-shadow:0 4px 20px var(--gold-glow);}
+.btn-gold:disabled{opacity:.4;cursor:not-allowed;}
+.btn-gold:not(:disabled):hover{filter:brightness(1.08);}
+.btn-gold:not(:disabled):active{transform:scale(.97);}
+.btn-outline{width:100%;padding:12px;border-radius:12px;border:1px solid var(--border2);
+  background:transparent;color:var(--muted);font-family:'Crimson Pro',serif;font-size:13px;
+  cursor:pointer;transition:border-color .2s,color .2s;}
+.btn-outline:hover{border-color:var(--ton);color:var(--ton);}
+.btn-cancel{width:100%;padding:12px;border-radius:12px;border:1px solid var(--border2);
+  background:transparent;color:var(--muted);font-family:'Crimson Pro',serif;font-size:13px;cursor:pointer;}
+.btn-cancel:hover{border-color:var(--p1);color:var(--p1);}
+
+/* SECTION LABEL */
+.sec-lbl{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);
+  font-weight:600;align-self:flex-start;margin-top:16px;}
+
+/* ── LOBBY ── */
+.player-slots{width:100%;display:flex;gap:10px;margin-top:6px;}
+.pslot{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:5px;
+  transition:border-color .3s,box-shadow .3s;}
+.pslot.p1s{border-color:#2a1a1a;}
+.pslot.p2s{border-color:#1a222a;}
+.pslot.filled.p1s{border-color:var(--p1);box-shadow:0 0 12px var(--p1g);}
+.pslot.filled.p2s{border-color:var(--p2);box-shadow:0 0 12px var(--p2g);}
+.pslot-icon{font-size:22px;}
+.pslot-lbl{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);}
+.pslot-addr{font-size:10px;font-family:monospace;}
+.p1s .pslot-addr{color:var(--p1);}
+.p2s .pslot-addr{color:var(--p2);}
+.pslot-wait{font-size:10px;color:var(--muted);font-style:italic;}
+
+.wager-grid{width:100%;display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:6px;}
+.wopt{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:10px 2px;text-align:center;cursor:pointer;transition:border-color .2s,box-shadow .2s,background .2s;}
+.wopt:active{transform:scale(.95);}
+.wopt-lbl{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+.wopt-val{font-family:'Cinzel Decorative',serif;font-size:14px;color:var(--text);}
+.wopt.sel{border-color:var(--gold);background:#1a1600;box-shadow:0 0 14px var(--gold-glow);}
+.wopt.sel .wopt-val{color:var(--gold);}
+.wopt.sel .wopt-lbl{color:var(--gold-dark);}
+
+.prize-box{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:14px;
+  padding:14px 16px;margin-top:6px;display:flex;flex-direction:column;gap:0;}
+.pr-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;}
+.pr-row+.pr-row{border-top:1px solid var(--border);}
+.pr-lbl{font-size:12px;color:var(--muted);}
+.pr-val{font-size:13px;font-weight:600;}
+.pr-val.gold{color:var(--gold);}
+.pr-val.green{color:var(--green);}
+.pr-val.muted{color:var(--muted);}
+.lobby-note{font-size:11px;color:var(--muted);text-align:center;line-height:1.5;margin-top:8px;}
+
+/* ── WAITING ── */
+#screenWaiting{justify-content:center;gap:20px;}
+.waiting-card{width:100%;max-width:340px;background:var(--surface);border:1px solid var(--border2);
+  border-radius:22px;padding:28px 22px;display:flex;flex-direction:column;align-items:center;gap:14px;}
+.pulse-ring{width:78px;height:78px;border-radius:50%;border:2px solid var(--ton);
+  display:flex;align-items:center;justify-content:center;font-size:34px;
+  animation:pulseR 1.8s ease-in-out infinite;}
+@keyframes pulseR{0%{box-shadow:0 0 0 0 var(--tong);}70%{box-shadow:0 0 0 14px transparent;}100%{box-shadow:0 0 0 0 transparent;}}
+.waiting-title{font-family:'Cinzel Decorative',serif;font-size:16px;}
+.waiting-desc{font-size:13px;color:var(--muted);text-align:center;line-height:1.5;}
+.share-box{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:10px;
+  padding:10px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;}
+.share-box span{font-size:10px;color:var(--ton);font-family:monospace;flex:1;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;}
+.share-box .copy{font-size:16px;flex-shrink:0;}
+.wager-badge{background:var(--surface2);border:1px solid var(--border2);border-radius:99px;
+  padding:6px 16px;font-size:12px;color:var(--gold);letter-spacing:.5px;}
+
+/* ── GAME ── */
+#screenGame{gap:0;padding-top:14px;}
+.game-hdr{width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.game-logo{font-family:'Cinzel Decorative',serif;font-size:15px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-dark));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.wager-chip{display:flex;align-items:center;gap:5px;background:var(--surface);
+  border:1px solid var(--border2);border-radius:99px;padding:5px 12px;font-size:11px;}
+.wager-chip span{color:var(--gold);font-weight:600;letter-spacing:.5px;}
+
+.scoreboard{display:flex;align-items:center;justify-content:space-between;width:100%;
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:10px 16px;gap:10px;margin-bottom:10px;}
+.ps{display:flex;flex-direction:column;align-items:center;gap:1px;flex:1;}
+.ps-lbl{font-size:9px;text-transform:uppercase;letter-spacing:2px;font-weight:600;}
+.p1c .ps-lbl{color:var(--p1);} .p2c .ps-lbl{color:var(--p2);}
+.ps-addr{font-size:9px;color:var(--muted);font-family:monospace;}
+.ps-score{font-family:'Cinzel Decorative',serif;font-size:26px;line-height:1;}
+.p1c .ps-score{color:var(--p1);text-shadow:0 0 10px var(--p1g);}
+.p2c .ps-score{color:var(--p2);text-shadow:0 0 10px var(--p2g);}
+.score-div{font-family:'Cinzel Decorative',serif;font-size:18px;color:var(--border2);}
+
+.turn-banner{width:100%;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:600;
+  letter-spacing:.5px;text-align:center;transition:all .3s;border:1px solid transparent;margin-bottom:10px;}
+.turn-banner.p1t{background:#1f1118;border-color:var(--p1);color:var(--p1);}
+.turn-banner.p2t{background:#111828;border-color:var(--p2);color:var(--p2);}
+.turn-banner.wait{background:var(--surface);border-color:var(--border);color:var(--muted);}
+
+.arena{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;gap:14px;}
+.player-row{display:flex;align-items:center;justify-content:space-around;width:100%;}
+.ptag{display:flex;flex-direction:column;align-items:center;gap:4px;opacity:.3;transition:opacity .3s;width:110px;}
+.ptag.active{opacity:1;} .ptag.chosen{opacity:.75;}
+.avatar{width:42px;height:42px;border-radius:50%;border:2px solid;
+  display:flex;align-items:center;justify-content:center;font-size:20px;transition:box-shadow .3s;}
+.pt1 .avatar{border-color:var(--p1);background:#1f1118;}
+.pt2 .avatar{border-color:var(--p2);background:#111828;}
+.pt1.active .avatar{box-shadow:0 0 14px var(--p1g);}
+.pt2.active .avatar{box-shadow:0 0 14px var(--p2g);}
+.pname{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;}
+.pt1 .pname{color:var(--p1);} .pt2 .pname{color:var(--p2);}
+.paddr{font-size:9px;color:var(--muted);font-family:monospace;}
+.cbadge{font-size:8px;padding:2px 7px;border-radius:99px;font-weight:600;
+  letter-spacing:1px;text-transform:uppercase;opacity:0;transition:opacity .3s;}
+.ptag.chosen .cbadge{opacity:1;}
+.pt1 .cbadge{background:var(--p1);color:#fff;} .pt2 .cbadge{background:var(--p2);color:#fff;}
+
+.boxes-row{display:flex;align-items:flex-end;justify-content:space-around;width:100%;gap:16px;}
+.box-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;}
+.box{width:100%;max-width:148px;aspect-ratio:1;cursor:pointer;position:relative;transition:transform .15s;}
+.box:active{transform:scale(.95);}
+.box.disabled{cursor:default;pointer-events:none;}
+.box-inner{width:100%;height:100%;position:relative;border-radius:18px;
+  background:linear-gradient(145deg,#1c1c2e,#131320);border:2px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  padding-bottom:12px;transition:border-color .3s,box-shadow .3s;overflow:hidden;}
+.box-lid{position:absolute;top:-2px;left:-2px;right:-2px;height:38%;
+  background:linear-gradient(160deg,#232335,#1a1a28);border-radius:18px 18px 0 0;
+  border:2px solid var(--border);border-bottom:none;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .5s cubic-bezier(.34,1.56,.64,1),border-color .3s;
+  transform-origin:top center;z-index:2;}
+.box-lid::after{content:'';width:26px;height:7px;background:linear-gradient(90deg,#2a2a40,#363650);
+  border-radius:4px;box-shadow:0 2px 5px #00000066;}
+.box-icon{font-size:36px;line-height:1;opacity:.12;transition:opacity .4s,font-size .4s;
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-40%);}
+.box-num{font-family:'Cinzel Decorative',serif;font-size:12px;color:var(--muted);
+  font-weight:700;letter-spacing:1px;position:relative;z-index:1;}
+.choice-dots{display:flex;gap:6px;height:10px;align-items:center;}
+.dot{width:10px;height:10px;border-radius:50%;border:1px solid var(--border);
+  background:transparent;transition:background .3s,border-color .3s,box-shadow .3s;}
+.dot.dp1{border-color:var(--p1);} .dot.dp2{border-color:var(--p2);}
+.dot.dp1.filled{background:var(--p1);box-shadow:0 0 6px var(--p1g);}
+.dot.dp2.filled{background:var(--p2);box-shadow:0 0 6px var(--p2g);}
+.box:not(.disabled):hover .box-inner{border-color:#3a3a5a;}
+.box.bc1 .box-inner{border-color:var(--p1);box-shadow:0 0 20px var(--p1g);}
+.box.bc2 .box-inner{border-color:var(--p2);box-shadow:0 0 20px var(--p2g);}
+.box.rwin .box-lid{transform:rotateX(-110deg);border-color:var(--gold);}
+.box.rwin .box-inner{border-color:var(--gold);box-shadow:0 0 36px var(--gold-glow),0 0 70px var(--gold-glow);
+  background:linear-gradient(145deg,#1e1c10,#181508);}
+.box.rwin .box-icon{opacity:1;font-size:50px;}
+.box.rlose .box-icon{opacity:.04;}
+.game-log{width:100%;font-size:11px;color:var(--muted);text-align:center;letter-spacing:.5px;
+  min-height:15px;padding-bottom:4px;}
+
+/* ── RESULT OVERLAY ── */
+.result-overlay{position:fixed;inset:0;background:#000000cc;backdrop-filter:blur(8px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:200;opacity:0;pointer-events:none;transition:opacity .4s;padding:20px;}
+.result-overlay.show{opacity:1;pointer-events:all;}
+.result-card{background:var(--surface);border:1px solid var(--border2);border-radius:24px;
+  padding:26px 22px 22px;width:100%;max-width:340px;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  transform:scale(.9);transition:transform .4s cubic-bezier(.34,1.3,.64,1);}
+.result-overlay.show .result-card{transform:scale(1);}
+.res-trophy{font-size:58px;line-height:1;animation:rtrophy .6s ease .3s both;}
+@keyframes rtrophy{0%{transform:scale(0) rotate(-10deg);}70%{transform:scale(1.15) rotate(3deg);}100%{transform:scale(1) rotate(0);}}
+.res-headline{font-family:'Cinzel Decorative',serif;font-size:20px;font-weight:900;
+  background:linear-gradient(135deg,var(--gold),#fff8d6,var(--gold-dark));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.res-winner{font-size:14px;font-weight:700;}
+.res-winner.rc1{color:var(--p1);} .res-winner.rc2{color:var(--p2);}
+
+.res-prizes{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:14px;
+  padding:12px 14px;display:flex;flex-direction:column;gap:0;margin-top:4px;}
+.rp-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;}
+.rp-row+.rp-row{border-top:1px solid var(--border);}
+.rp-lbl{font-size:11px;color:var(--muted);}
+.rp-val{font-size:12px;font-weight:700;}
+.rp-val.gold{color:var(--gold);} .rp-val.green{color:var(--green);} .rp-val.muted{color:var(--muted);}
+.rp-div{height:1px;background:var(--border);margin:2px 0;}
+.rp-total-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;}
+.rp-total-lbl{font-size:12px;font-weight:600;color:var(--text);}
+.rp-total-val{font-size:14px;font-weight:700;color:var(--gold);}
+
+.tx-status{font-size:11px;color:var(--ton);letter-spacing:.5px;display:flex;align-items:center;gap:6px;}
+.tx-dot{width:6px;height:6px;border-radius:50%;background:var(--ton);flex-shrink:0;animation:blink 1.2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+
+/* SPARKLES + TOAST */
+.sparkle{position:fixed;pointer-events:none;font-size:18px;
+  animation:sparkle-fly 1s ease-out forwards;z-index:300;}
+@keyframes sparkle-fly{0%{opacity:1;transform:translate(0,0) scale(1);}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.2);}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--surface2);border:1px solid var(--border2);border-radius:99px;
+  padding:8px 18px;font-size:12px;color:var(--text);letter-spacing:.5px;
+  opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;z-index:400;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- ══ SCREEN 1: CONNECT ══ -->
+<div class="screen active" id="screenConnect">
+  <div class="hdr">
+    <div class="logo">Gold Box Duel</div>
+    <div class="logo-sub">TON · Skill · Fortune</div>
+  </div>
+  <div class="connect-card">
+    <div class="ton-logo">💎</div>
+    <div class="connect-title">Connect Your Wallet</div>
+    <div class="connect-desc">Link your TON wallet to place wagers and receive winnings instantly on-chain.</div>
+    <button class="btn-ton" onclick="connectWallet()">💎 Connect TON Wallet</button>
+    <div class="connect-note">Powered by TON Connect · Non-custodial · Instant payouts</div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 2: LOBBY ══ -->
+<div class="screen" id="screenLobby">
+  <div class="hdr">
+    <div class="logo">Gold Box Duel</div>
+    <div class="logo-sub">Set your wager · Challenge an opponent</div>
+  </div>
+  <div style="width:100%;max-width:400px;display:flex;flex-direction:column;">
+    <div class="sec-lbl">Players</div>
+    <div class="player-slots">
+      <div class="pslot p1s filled" id="slot1">
+        <div class="pslot-icon">⚔️</div>
+        <div class="pslot-lbl">Player 1 · You</div>
+        <div class="pslot-addr" id="slot1addr">—</div>
+      </div>
+      <div class="pslot p2s" id="slot2">
+        <div class="pslot-icon">🛡️</div>
+        <div class="pslot-lbl">Player 2</div>
+        <div class="pslot-wait">Waiting...</div>
+      </div>
+    </div>
+
+    <div class="sec-lbl">Choose Wager</div>
+    <div class="wager-grid">
+      <div class="wopt" onclick="selectWager(5,this)"><div class="wopt-lbl">TON</div><div class="wopt-val">5</div></div>
+      <div class="wopt" onclick="selectWager(10,this)"><div class="wopt-lbl">TON</div><div class="wopt-val">10</div></div>
+      <div class="wopt" onclick="selectWager(25,this)"><div class="wopt-lbl">TON</div><div class="wopt-val">25</div></div>
+      <div class="wopt" onclick="selectWager(50,this)"><div class="wopt-lbl">TON</div><div class="wopt-val">50</div></div>
+      <div class="wopt" onclick="selectWager(100,this)"><div class="wopt-lbl">TON</div><div class="wopt-val">100</div></div>
+    </div>
+
+    <div class="sec-lbl">Prize Breakdown</div>
+    <div class="prize-box">
+      <div class="pr-row">
+        <div class="pr-lbl">💰 Total pot (both stakes)</div>
+        <div class="pr-val gold" id="prTotal">— TON</div>
+      </div>
+      <div class="pr-row">
+        <div class="pr-lbl">🏆 Winner gets back own stake + 80% of loser's</div>
+        <div class="pr-val green" id="prWinner">— TON</div>
+      </div>
+      <div class="pr-row">
+        <div class="pr-lbl">🏛 House fee (20% of loser's stake)</div>
+        <div class="pr-val muted" id="prHouse">— TON</div>
+      </div>
+    </div>
+
+    <button class="btn-gold" id="btnJoin" disabled onclick="joinGame()" style="margin-top:12px;">
+      ⚔️ Create Game &amp; Lock Wager
+    </button>
+    <div class="lobby-note">Both players must stake the same amount.<br>Funds locked in smart contract until result.</div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 3: WAITING ══ -->
+<div class="screen" id="screenWaiting">
+  <div class="hdr"><div class="logo">Gold Box Duel</div></div>
+  <div class="waiting-card">
+    <div class="pulse-ring">⚔️</div>
+    <div class="waiting-title">Waiting for Opponent</div>
+    <div class="wager-badge" id="wagerBadge">Stake: — TON each</div>
+    <div class="waiting-desc">Share this invite link. Your opponent must stake the same amount to join.</div>
+    <div class="share-box" onclick="copyLink()">
+      <span id="shareLink">https://t.me/GoldBoxDuelBot/play?game=ABC123</span>
+      <div class="copy">📋</div>
+    </div>
+    <button class="btn-ton" onclick="simulateP2Join()">🧪 Demo: Opponent Joins</button>
+    <button class="btn-cancel" onclick="cancelGame()">✕ Cancel &amp; Refund</button>
+  </div>
+</div>
+
+<!-- ══ SCREEN 4: GAME ══ -->
+<div class="screen" id="screenGame">
+  <div class="game-hdr">
+    <div class="game-logo">Gold Box Duel</div>
+    <div class="wager-chip">💎 <span id="wagerChipVal">— TON each</span></div>
+  </div>
+
+  <div class="scoreboard">
+    <div class="ps p1c">
+      <div class="ps-lbl">Player 1</div>
+      <div class="ps-addr" id="sbAddr1">—</div>
+      <div class="ps-score" id="score1">0</div>
+    </div>
+    <div class="score-div">·</div>
+    <div class="ps p2c">
+      <div class="ps-lbl">Player 2</div>
+      <div class="ps-addr" id="sbAddr2">—</div>
+      <div class="ps-score" id="score2">0</div>
+    </div>
+  </div>
+
+  <div class="turn-banner p1t" id="turnBanner">⚔️ Player 1 — Choose your box</div>
+
+  <div class="arena">
+    <div class="player-row">
+      <div class="ptag pt1 active" id="pt1">
+        <div class="avatar">⚔️</div>
+        <div class="pname">Player 1</div>
+        <div class="paddr" id="ptAddr1">—</div>
+        <div class="cbadge">Locked In</div>
+      </div>
+      <div class="ptag pt2" id="pt2">
+        <div class="avatar">🛡️</div>
+        <div class="pname">Player 2</div>
+        <div class="paddr" id="ptAddr2">—</div>
+        <div class="cbadge">Locked In</div>
+      </div>
+    </div>
+
+    <div class="boxes-row">
+      <div class="box-wrap">
+        <div class="box" id="box0" onclick="chooseBox(0)">
+          <div class="box-inner">
+            <div class="box-lid"></div>
+            <div class="box-icon">📦</div>
+            <div class="box-num">I</div>
+          </div>
+        </div>
+        <div class="choice-dots">
+          <div class="dot dp1" id="d0p1"></div>
+          <div class="dot dp2" id="d0p2"></div>
+        </div>
+      </div>
+      <div class="box-wrap">
+        <div class="box" id="box1" onclick="chooseBox(1)">
+          <div class="box-inner">
+            <div class="box-lid"></div>
+            <div class="box-icon">📦</div>
+            <div class="box-num">II</div>
+          </div>
+        </div>
+        <div class="choice-dots">
+          <div class="dot dp1" id="d1p1"></div>
+          <div class="dot dp2" id="d1p2"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="game-log" id="gameLog">Round begins — Player 1 picks first</div>
+</div>
+
+<!-- ══ RESULT OVERLAY ══ -->
+<div class="result-overlay" id="resultOverlay">
+  <div class="result-card">
+    <div class="res-trophy" id="resTrophy">🏆</div>
+    <div class="res-headline" id="resHeadline">Victory!</div>
+    <div class="res-winner" id="resWinner"></div>
+
+    <div class="res-prizes">
+      <div class="rp-row">
+        <div class="rp-lbl">💰 Total pot</div>
+        <div class="rp-val gold" id="rpTotal">—</div>
+      </div>
+      <div class="rp-row">
+        <div class="rp-lbl">Winner's own stake returned</div>
+        <div class="rp-val muted" id="rpStake">—</div>
+      </div>
+      <div class="rp-row">
+        <div class="rp-lbl">🏆 80% of loser's stake</div>
+        <div class="rp-val green" id="rpBonus">—</div>
+      </div>
+      <div class="rp-row">
+        <div class="rp-lbl">🏛 House cut (20% of loser)</div>
+        <div class="rp-val muted" id="rpHouse">—</div>
+      </div>
+      <div class="rp-div"></div>
+      <div class="rp-total-row">
+        <div class="rp-total-lbl">💸 Winner receives</div>
+        <div class="rp-total-val" id="rpReceives">—</div>
+      </div>
+    </div>
+
+    <div class="tx-status" id="txStatus">
+      <div class="tx-dot"></div>
+      <span>Broadcasting transaction on TON...</span>
+    </div>
+
+    <button class="btn-gold" onclick="playAgain()" style="margin-top:4px;">⚔ Play Again</button>
+    <button class="btn-outline" onclick="goLobby()">← New Game / Lobby</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════
+const OWNER_WALLET = 'EQOwner_GoldBoxDuel_ReplaceWithReal'; // TODO: your wallet/contract addr
+const HOUSE_PCT    = 0.20;  // 20% of loser's stake → house
+const WINNER_PCT   = 0.80;  // 80% of loser's stake → winner (winner also keeps own stake)
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let walletAddr = '', p2Addr = '';
+let selectedWager = 0;
+let goldBox = -1, turn = 1, p1Choice = -1, p2Choice = -1;
+let score1 = 0, score2 = 0, round = 1, gameOver = false;
+
+// ═══════════════════════════════════════════════
+//  TELEGRAM
+// ═══════════════════════════════════════════════
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#0a0a10'); tg.setBackgroundColor('#0a0a10'); }
+const haptic = (t='light') => tg?.HapticFeedback?.impactOccurred?.(t);
+const hapticN = (t='success') => tg?.HapticFeedback?.notificationOccurred?.(t);
+
+// ═══════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════
+const showScreen = id => {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+};
+const short = a => a ? a.slice(0,5)+'…'+a.slice(-4) : '—';
+const setLog = m => document.getElementById('gameLog').textContent = m;
+function showToast(msg, ms=2300) {
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), ms);
+}
+
+// ═══════════════════════════════════════════════
+//  SCREEN 1 — CONNECT WALLET
+// ═══════════════════════════════════════════════
+function connectWallet() {
+  haptic('medium');
+  /*
+   * TODO: Real TON Connect integration
+   * ─────────────────────────────────
+   * import TonConnect from '@tonconnect/sdk';
+   * const connector = new TonConnect({ manifestUrl: 'https://yourapp.com/tonconnect-manifest.json' });
+   * const walletsList = await connector.getWallets();
+   * await connector.connect(walletsList[0]); // or show wallet picker
+   * connector.onStatusChange(wallet => {
+   *   if (wallet) { walletAddr = wallet.account.address; afterConnect(); }
+   * });
+   */
+  // DEMO simulation:
+  walletAddr = 'EQA1' + Math.random().toString(36).slice(2,8).toUpperCase() + 'User';
+  afterConnect();
+}
+
+function afterConnect() {
+  document.getElementById('slot1addr').textContent = short(walletAddr);
+  document.getElementById('sbAddr1').textContent   = short(walletAddr);
+  document.getElementById('ptAddr1').textContent   = short(walletAddr);
+  showToast('✅ Wallet connected: ' + short(walletAddr));
+  setTimeout(() => showScreen('screenLobby'), 700);
+}
+
+// ═══════════════════════════════════════════════
+//  SCREEN 2 — LOBBY
+// ═══════════════════════════════════════════════
+function selectWager(amount, el) {
+  haptic('light');
+  selectedWager = amount;
+  document.querySelectorAll('.wopt').forEach(e => e.classList.remove('sel'));
+  el.classList.add('sel');
+  updatePrize();
+  document.getElementById('btnJoin').disabled = false;
+}
+
+function updatePrize() {
+  const w = selectedWager;
+  const pot          = w * 2;
+  const house        = +(w * HOUSE_PCT).toFixed(2);    // 20% of LOSER's stake
+  const winnerBonus  = +(w * WINNER_PCT).toFixed(2);   // 80% of loser's stake
+  const winnerTotal  = +(w + winnerBonus).toFixed(2);  // own stake + bonus
+  document.getElementById('prTotal').textContent   = pot + ' TON';
+  document.getElementById('prWinner').textContent  = winnerTotal + ' TON';
+  document.getElementById('prHouse').textContent   = house + ' TON';
+}
+
+function joinGame() {
+  if (!selectedWager) return;
+  haptic('medium');
+  /*
+   * TODO: Smart contract call to lock wager
+   * ────────────────────────────────────────
+   * await tonConnector.sendTransaction({
+   *   validUntil: Math.floor(Date.now()/1000) + 300,
+   *   messages: [{
+   *     address: GAME_CONTRACT_ADDR,
+   *     amount: toNano(selectedWager).toString(),
+   *     payload: buildCreateGamePayload({ player1: walletAddr })
+   *   }]
+   * });
+   */
+  const gameId = Math.random().toString(36).slice(2,8).toUpperCase();
+  document.getElementById('wagerBadge').textContent = 'Stake: ' + selectedWager + ' TON each';
+  document.getElementById('shareLink').textContent  = `https://t.me/GoldBoxDuelBot/play?game=${gameId}&w=${selectedWager}`;
+  showScreen('screenWaiting');
+}
+
+// ═══════════════════════════════════════════════
+//  SCREEN 3 — WAITING
+// ═══════════════════════════════════════════════
+function copyLink() {
+  haptic('light');
+  const link = document.getElementById('shareLink').textContent;
+  navigator.clipboard?.writeText(link).catch(()=>{});
+  if (tg?.openTelegramLink) {
+    tg.openTelegramLink('https://t.me/share/url?url='+encodeURIComponent(link)
+      +'&text='+encodeURIComponent('⚔️ Duel me in Gold Box Duel! Stake: '+selectedWager+' TON'));
+  }
+  showToast('🔗 Invite link copied!');
+}
+
+function simulateP2Join() {
+  haptic('medium');
+  /*
+   * TODO: In production this is triggered by a webhook/WebSocket
+   * when the smart contract detects player2's stake transaction.
+   * contract.on('PlayerJoined', ({ player2 }) => { p2Addr = player2; startGame(); });
+   */
+  p2Addr = 'EQB2' + Math.random().toString(36).slice(2,8).toUpperCase() + 'Opp';
+  document.getElementById('sbAddr2').textContent  = short(p2Addr);
+  document.getElementById('ptAddr2').textContent  = short(p2Addr);
+  document.getElementById('wagerChipVal').textContent = selectedWager + ' TON each';
+  // update lobby slot2
+  document.getElementById('slot2').className = 'pslot p2s filled';
+  document.getElementById('slot2').innerHTML =
+    `<div class="pslot-icon">🛡️</div><div class="pslot-lbl">Player 2</div>
+     <div class="pslot-addr" style="color:var(--p2)">${short(p2Addr)}</div>`;
+  showToast('🛡️ Opponent joined! Game starting…');
+  setTimeout(startGame, 1000);
+}
+
+function cancelGame() {
+  haptic('light');
+  /*
+   * TODO: contract.call('cancelGame') → refund player1
+   */
+  showToast('↩️ Cancelled. Refund broadcasting…');
+  setTimeout(() => showScreen('screenLobby'), 1200);
+}
+
+// ═══════════════════════════════════════════════
+//  SCREEN 4 — GAME LOGIC
+// ═══════════════════════════════════════════════
+function startGame() {
+  score1 = 0; score2 = 0; round = 1;
+  document.getElementById('score1').textContent = 0;
+  document.getElementById('score2').textContent = 0;
+  newRound();
+  showScreen('screenGame');
+}
+
+function newRound() {
+  goldBox = Math.random() < 0.5 ? 0 : 1;
+  turn = 1; p1Choice = -1; p2Choice = -1; gameOver = false;
+  for (let i=0; i<2; i++) {
+    const b = document.getElementById('box'+i);
+    b.className = 'box';
+    b.querySelector('.box-icon').textContent = '📦';
+    document.getElementById('d'+i+'p1').classList.remove('filled');
+    document.getElementById('d'+i+'p2').classList.remove('filled');
+  }
+  document.getElementById('pt1').className = 'ptag pt1 active';
+  document.getElementById('pt2').className = 'ptag pt2';
+  updateTurnBanner();
+  setLog('Round ' + round + ' — Player 1 picks first');
+}
+
+function updateTurnBanner() {
+  const b = document.getElementById('turnBanner');
+  if      (turn===1) { b.className='turn-banner p1t'; b.textContent='⚔️ Player 1 — Choose your box'; }
+  else if (turn===2) { b.className='turn-banner p2t'; b.textContent='🛡️ Player 2 — Choose the other box'; }
+  else               { b.className='turn-banner wait'; b.textContent='🎲 Revealing the gold…'; }
+}
+
+function chooseBox(idx) {
+  if (gameOver) return;
+  if (turn === 1) {
+    haptic('light');
+    p1Choice = idx;
+    document.getElementById('box'+idx).classList.add('bc1');
+    document.getElementById('d'+idx+'p1').classList.add('filled');
+    const pt1 = document.getElementById('pt1');
+    pt1.classList.remove('active'); pt1.classList.add('chosen');
+    document.getElementById('pt2').classList.add('active');
+    turn = 2; updateTurnBanner();
+    setLog('Player 1 locked Box '+(idx===0?'I':'II')+'  —  Player 2, your turn!');
+  } else if (turn === 2) {
+    if (idx === p1Choice) {
+      shakeBox(idx); hapticN('error');
+      setLog('⚠️  Player 2 must choose the OTHER box!'); return;
+    }
+    haptic('medium');
+    p2Choice = idx;
+    document.getElementById('box'+idx).classList.add('bc2');
+    document.getElementById('d'+idx+'p2').classList.add('filled');
+    const pt2 = document.getElementById('pt2');
+    pt2.classList.remove('active'); pt2.classList.add('chosen');
+    gameOver = true; turn = 0; updateTurnBanner();
+    setTimeout(revealResult, 700);
+  }
+}
+
+function revealResult() {
+  document.getElementById('box'+goldBox).classList.add('rwin');
+  document.getElementById('box'+goldBox).querySelector('.box-icon').textContent = '🪙';
+  document.getElementById('box'+(goldBox===0?1:0)).classList.add('rlose');
+
+  setTimeout(() => {
+    const winner = (p1Choice === goldBox) ? 1 : 2;
+    if (winner===1) { score1++; document.getElementById('score1').textContent=score1; }
+    else            { score2++; document.getElementById('score2').textContent=score2; }
+
+    // Prize math
+    const loserStake    = selectedWager;
+    const house         = +(loserStake * HOUSE_PCT).toFixed(2);   // 20% of loser
+    const winnerBonus   = +(loserStake * WINNER_PCT).toFixed(2);  // 80% of loser
+    const winnerStake   = selectedWager;                           // own stake back
+    const winnerTotal   = +(winnerStake + winnerBonus).toFixed(2);
+    const pot           = selectedWager * 2;
+
+    document.getElementById('rpTotal').textContent    = pot + ' TON';
+    document.getElementById('rpStake').textContent    = winnerStake + ' TON';
+    document.getElementById('rpBonus').textContent    = '+' + winnerBonus + ' TON';
+    document.getElementById('rpHouse').textContent    = house + ' TON → ' + short(OWNER_WALLET);
+    document.getElementById('rpReceives').textContent = winnerTotal + ' TON';
+
+    const wAddr  = winner===1 ? walletAddr : p2Addr;
+    const wLabel = 'Player '+ winner + '  ·  ' + short(wAddr);
+    const wClass = winner===1 ? 'rc1' : 'rc2';
+    document.getElementById('resTrophy').textContent  = '🏆';
+    document.getElementById('resHeadline').textContent = 'Victory!';
+    document.getElementById('resWinner').textContent   = wLabel;
+    document.getElementById('resWinner').className     = 'res-winner ' + wClass;
+
+    /*
+     * TODO: Smart contract resolution
+     * ────────────────────────────────
+     * This should happen server-side (your bot backend) after verifying result:
+     *
+     * await contract.call('resolveGame', {
+     *   gameId,
+     *   winner:      wAddr,
+     *   winnerPay:   toNano(winnerTotal),
+     *   houseAddr:   OWNER_WALLET,
+     *   housePay:    toNano(house),
+     * });
+     *
+     * Frontend listens for tx confirmation via webhook or polling.
+     */
+    const txEl = document.getElementById('txStatus');
+    txEl.innerHTML = '<div class="tx-dot"></div><span>Broadcasting on TON…</span>';
+    txEl.style.color = 'var(--ton)';
+    setTimeout(() => {
+      txEl.innerHTML = '✅ <span>Transaction confirmed on TON!</span>';
+      txEl.style.color = 'var(--green)';
+    }, 2800);
+
+    spawnSparkles(winner===1 ? '#e05c5c' : '#5ca8e0');
+    hapticN('success');
+    round++;
+    setTimeout(() => document.getElementById('resultOverlay').classList.add('show'), 400);
+  }, 600);
+}
+
+function shakeBox(idx) {
+  const b = document.getElementById('box'+idx);
+  ['-8px','8px','-5px','5px',''].forEach((v,i)=>
+    setTimeout(()=>{ b.style.transform = v ? `translateX(${v})` : ''; }, i*80));
+}
+
+function spawnSparkles(color) {
+  const emojis = ['✨','⭐','💫','🌟','💰','🪙'];
+  for (let i=0; i<18; i++) setTimeout(()=>{
+    const el = document.createElement('div'); el.className='sparkle';
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.left = (20+Math.random()*(window.innerWidth-40))+'px';
+    el.style.top  = (window.innerHeight*.2+Math.random()*(window.innerHeight*.55))+'px';
+    const a=Math.random()*Math.PI*2, d=50+Math.random()*110;
+    el.style.setProperty('--dx', Math.cos(a)*d+'px');
+    el.style.setProperty('--dy', Math.sin(a)*d+'px');
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 1100);
+  }, i*55);
+}
+
+function playAgain() {
+  haptic('medium');
+  document.getElementById('resultOverlay').classList.remove('show');
+  setTimeout(newRound, 300);
+}
+
+function goLobby() {
+  haptic('light');
+  document.getElementById('resultOverlay').classList.remove('show');
+  // reset slot2
+  document.getElementById('slot2').className='pslot p2s';
+  document.getElementById('slot2').innerHTML=
+    `<div class="pslot-icon">🛡️</div><div class="pslot-lbl">Player 2</div><div class="pslot-wait">Waiting...</div>`;
+  showScreen('screenLobby');
+}
+</script>
+</body>
+</html>
