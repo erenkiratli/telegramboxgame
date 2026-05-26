@@ -3,7 +3,11 @@
 // POST { gameId }
 // Returns { winner, goldBox, winnerReceives, housePaid, txHash }
 
-const { kv } = require('@vercel/kv');
+const { Redis } = require('@upstash/redis');
+const kv = new Redis({
+  url: process.env.KV_REST_API_URL,
+  token: process.env.KV_REST_API_TOKEN,
+});
 
 // TON testnet endpoint
 const TON_ENDPOINT = 'https://testnet.toncenter.com/api/v2';
