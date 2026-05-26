@@ -3,7 +3,11 @@
 // POST { wager: 10, p1Wallet: "EQ..." }
 // Returns { gameId, inviteLink }
 
-const { kv } = require('@vercel/kv');
+const { Redis } = require('@upstash/redis');
+const kv = new Redis({
+  url: process.env.KV_REST_API_URL,
+  token: process.env.KV_REST_API_TOKEN,
+});
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const APP_URL   = process.env.APP_URL;
