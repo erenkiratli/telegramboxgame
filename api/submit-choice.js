@@ -3,7 +3,11 @@
 // POST { gameId, wallet, choice: 0|1 }
 // Returns { waiting: true } or { ready: true } when both have chosen
 
-const { kv } = require('@vercel/kv');
+const { Redis } = require('@upstash/redis');
+const kv = new Redis({
+  url: process.env.KV_REST_API_URL,
+  token: process.env.KV_REST_API_TOKEN,
+});
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
