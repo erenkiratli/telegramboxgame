@@ -3,7 +3,11 @@
 // GET /api/game-status?gameId=ABC123
 // Returns safe game state (goldBox is NEVER returned until resolved)
 
-const { kv } = require('@vercel/kv');
+const { Redis } = require('@upstash/redis');
+const kv = new Redis({
+  url: process.env.KV_REST_API_URL,
+  token: process.env.KV_REST_API_TOKEN,
+});
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
