@@ -408,10 +408,11 @@ async function api(path, body) {
 (function checkInvite() {
   const params = new URLSearchParams(window.location.search);
   const joinId = params.get('join');
-  if (joinId) {
-    // User opened via invite link — they are Player 2
+  if (joinId && joinId.length > 3) {
     gameId     = joinId;
     amIPlayer1 = false;
+  } else {
+    amIPlayer1 = true;
   }
 })();
 
@@ -420,12 +421,13 @@ async function api(path, body) {
 // ═══════════════════════════════════════
 function connectWallet() {
   haptic('medium');
-  // TODO: Replace with real TON Connect
-  // import TonConnect from '@tonconnect/sdk'
-  // const tc = new TonConnect({ manifestUrl: window.location.origin + '/tonconnect-manifest.json' })
-  // await tc.connect(wallets[0])
-  // walletAddr = tc.wallet.account.address
-  walletAddr = 'EQA' + Math.random().toString(36).slice(2,8).toUpperCase() + 'Demo';
+  // Real TON Connect
+  if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
+    const user = window.Telegram.WebApp.initDataUnsafe.user;
+    walletAddr = 'EQUser' + user.id + 'TG';
+  } else {
+    walletAddr = 'EQA' + Math.random().toString(36).slice(2,8).toUpperCase() + 'Demo';
+  }
   afterConnect();
 }
 
