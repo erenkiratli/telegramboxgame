@@ -5,9 +5,9 @@
 const { mnemonicToPrivateKey } = require('@ton/crypto');
 const { WalletContractV4, internal, toNano, fromNano, TonClient } = require('@ton/ton');
 
-// TON Testnet client
+// TON Mainnet client
 const client = new TonClient({
-  endpoint: 'https://testnet.toncenter.com/api/v2/jsonRPC',
+  endpoint: 'https://toncenter.com/api/v2/jsonRPC',
   apiKey: process.env.TON_API_KEY || undefined,
 });
 
@@ -71,6 +71,12 @@ async function sendTon(toAddress, amountNano) {
 async function getHouseBalance() {
   const { contract } = await getHouseWallet();
   const balance = await contract.getBalance();
+  return fromNano(balance);
+}
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+module.exports = { sendTon, getHouseBalance };
   return fromNano(balance);
 }
 
