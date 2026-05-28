@@ -407,12 +407,16 @@ async function api(path, body) {
 //  CHECK FOR INVITE LINK ON LOAD
 // ═══════════════════════════════════════
 (function checkInvite() {
-  const params = new URLSearchParams(window.location.search);
-  const joinId = params.get('join');
-  if (joinId && joinId.length > 3) {
-    gameId     = joinId;
-    amIPlayer1 = false;
-  } else {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const joinId = params.get('join');
+    if (joinId && joinId.length > 3) {
+      gameId     = joinId;
+      amIPlayer1 = false;
+    } else {
+      amIPlayer1 = true;
+    }
+  } catch(e) {
     amIPlayer1 = true;
   }
 })();
