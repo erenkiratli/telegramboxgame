@@ -13,7 +13,7 @@
   --p1:#e05c5c;--p2:#5ca8e0;--p1g:#e05c5c44;--p2g:#5ca8e044;
   --ton:#0098ea;--tong:#0098ea44;
   --text:#e8e4d8;--muted:#6a6a8a;--border:#22223a;--border2:#2e2e4a;
-  --green:#4caf82;--greeng:#4caf8244;
+  --green:#4caf82;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;min-height:100vh;background:var(--bg);color:var(--text);
@@ -22,18 +22,14 @@ html,body{height:100%;min-height:100vh;background:var(--bg);color:var(--text);
 body{display:flex;flex-direction:column;align-items:center;
   background:radial-gradient(ellipse at 15% 0%,#1a1020 0%,transparent 50%),
   radial-gradient(ellipse at 85% 100%,#0d1525 0%,transparent 50%),var(--bg);}
-
 .screen{display:none;flex-direction:column;align-items:center;width:100%;min-height:100vh;padding:0 16px 24px;}
 .screen.active{display:flex;}
-
 .hdr{width:100%;text-align:center;padding:22px 0 14px;}
 .logo{font-family:'Cinzel Decorative',serif;font-size:20px;font-weight:900;letter-spacing:2px;
   background:linear-gradient(135deg,var(--gold) 0%,#fff8d6 50%,var(--gold-dark) 100%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
   filter:drop-shadow(0 0 10px var(--gold-glow));}
 .logo-sub{font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:3px;}
-
-/* BUTTONS */
 .btn-ton{width:100%;padding:15px;border-radius:14px;border:none;
   background:linear-gradient(135deg,#0070b8,#00b4ea);color:#fff;
   font-family:'Cinzel Decorative',serif;font-size:13px;font-weight:700;letter-spacing:1px;
@@ -52,8 +48,6 @@ body{display:flex;flex-direction:column;align-items:center;
   background:transparent;color:var(--muted);font-family:'Crimson Pro',serif;font-size:13px;cursor:pointer;}
 .sec-lbl{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);
   font-weight:600;align-self:flex-start;margin-top:16px;}
-
-/* CONNECT */
 .connect-card{width:100%;max-width:360px;background:var(--surface);border:1px solid var(--border2);
   border-radius:24px;padding:32px 24px 28px;display:flex;flex-direction:column;align-items:center;gap:18px;}
 .ton-logo{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#0070b8,#00b4ea);
@@ -61,17 +55,17 @@ body{display:flex;flex-direction:column;align-items:center;
 .connect-title{font-family:'Cinzel Decorative',serif;font-size:18px;text-align:center;}
 .connect-desc{font-size:13px;color:var(--muted);text-align:center;line-height:1.6;max-width:260px;}
 .connect-note{font-size:10px;color:var(--muted);text-align:center;letter-spacing:.5px;}
-
-/* LOBBY */
 .player-slots{width:100%;display:flex;gap:10px;margin-top:6px;}
 .pslot{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:14px;
   padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:5px;transition:border-color .3s,box-shadow .3s;}
 .pslot.p1s.filled{border-color:var(--p1);box-shadow:0 0 12px var(--p1g);}
 .pslot.p2s.filled{border-color:var(--p2);box-shadow:0 0 12px var(--p2g);}
-.pslot-icon{font-size:22px;}.pslot-lbl{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);}
-.pslot-addr{font-size:10px;font-family:monospace;}.p1s .pslot-addr{color:var(--p1);}.p2s .pslot-addr{color:var(--p2);}
+.pslot-icon{font-size:22px;}
+.pslot-lbl{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);}
+.pslot-addr{font-size:10px;font-family:monospace;}
+.p1s .pslot-addr{color:var(--p1);}
+.p2s .pslot-addr{color:var(--p2);}
 .pslot-wait{font-size:10px;color:var(--muted);font-style:italic;}
-
 .wager-grid{width:100%;display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:6px;}
 .wopt{background:var(--surface);border:1px solid var(--border);border-radius:10px;
   padding:10px 2px;text-align:center;cursor:pointer;transition:border-color .2s,box-shadow .2s,background .2s;}
@@ -79,18 +73,18 @@ body{display:flex;flex-direction:column;align-items:center;
 .wopt-lbl{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
 .wopt-val{font-family:'Cinzel Decorative',serif;font-size:14px;color:var(--text);}
 .wopt.sel{border-color:var(--gold);background:#1a1600;box-shadow:0 0 14px var(--gold-glow);}
-.wopt.sel .wopt-val{color:var(--gold);}.wopt.sel .wopt-lbl{color:var(--gold-dark);}
-
+.wopt.sel .wopt-val{color:var(--gold);}
+.wopt.sel .wopt-lbl{color:var(--gold-dark);}
 .prize-box{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:14px;
   padding:14px 16px;margin-top:6px;}
 .pr-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;}
 .pr-row+.pr-row{border-top:1px solid var(--border);}
 .pr-lbl{font-size:12px;color:var(--muted);}
 .pr-val{font-size:13px;font-weight:600;}
-.pr-val.gold{color:var(--gold);}.pr-val.green{color:var(--green);}.pr-val.muted{color:var(--muted);}
+.pr-val.gold{color:var(--gold);}
+.pr-val.green{color:var(--green);}
+.pr-val.muted{color:var(--muted);}
 .lobby-note{font-size:11px;color:var(--muted);text-align:center;line-height:1.5;margin-top:8px;}
-
-/* WAITING */
 #screenWaiting{justify-content:center;gap:20px;}
 .waiting-card{width:100%;max-width:340px;background:var(--surface);border:1px solid var(--border2);
   border-radius:22px;padding:28px 22px;display:flex;flex-direction:column;align-items:center;gap:14px;}
@@ -105,8 +99,6 @@ body{display:flex;flex-direction:column;align-items:center;
 .share-box{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:10px;
   padding:10px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;}
 .share-box span{font-size:10px;color:var(--ton);font-family:monospace;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-
-/* GAME */
 #screenGame{gap:0;padding-top:14px;}
 .game-hdr{width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .game-logo{font-family:'Cinzel Decorative',serif;font-size:15px;
@@ -115,29 +107,28 @@ body{display:flex;flex-direction:column;align-items:center;
 .wager-chip{display:flex;align-items:center;gap:5px;background:var(--surface);
   border:1px solid var(--border2);border-radius:99px;padding:5px 12px;font-size:11px;}
 .wager-chip span{color:var(--gold);font-weight:600;}
-
 .scoreboard{display:flex;align-items:center;justify-content:space-between;width:100%;
   background:var(--surface);border:1px solid var(--border);border-radius:14px;
   padding:10px 16px;gap:10px;margin-bottom:10px;}
 .ps{display:flex;flex-direction:column;align-items:center;gap:1px;flex:1;}
 .ps-lbl{font-size:9px;text-transform:uppercase;letter-spacing:2px;font-weight:600;}
-.ps1 .ps-lbl{color:var(--p1);}.ps2 .ps-lbl{color:var(--p2);}
+.ps1 .ps-lbl{color:var(--p1);}
+.ps2 .ps-lbl{color:var(--p2);}
 .ps-addr{font-size:9px;color:var(--muted);font-family:monospace;}
 .ps-score{font-family:'Cinzel Decorative',serif;font-size:26px;line-height:1;}
 .ps1 .ps-score{color:var(--p1);text-shadow:0 0 10px var(--p1g);}
 .ps2 .ps-score{color:var(--p2);text-shadow:0 0 10px var(--p2g);}
 .score-div{font-family:'Cinzel Decorative',serif;font-size:18px;color:var(--border2);}
-
 .turn-banner{width:100%;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:600;
   letter-spacing:.5px;text-align:center;transition:all .3s;border:1px solid transparent;margin-bottom:10px;}
 .turn-banner.p1t{background:#1f1118;border-color:var(--p1);color:var(--p1);}
 .turn-banner.p2t{background:#111828;border-color:var(--p2);color:var(--p2);}
 .turn-banner.wait{background:var(--surface);border-color:var(--border);color:var(--muted);}
-
 .arena{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;gap:14px;}
 .player-row{display:flex;align-items:center;justify-content:space-around;width:100%;}
 .ptag{display:flex;flex-direction:column;align-items:center;gap:4px;opacity:.3;transition:opacity .3s;width:110px;}
-.ptag.active{opacity:1;}.ptag.chosen{opacity:.75;}
+.ptag.active{opacity:1;}
+.ptag.chosen{opacity:.75;}
 .avatar{width:42px;height:42px;border-radius:50%;border:2px solid;
   display:flex;align-items:center;justify-content:center;font-size:20px;transition:box-shadow .3s;}
 .pt1 .avatar{border-color:var(--p1);background:#1f1118;}
@@ -145,13 +136,14 @@ body{display:flex;flex-direction:column;align-items:center;
 .pt1.active .avatar{box-shadow:0 0 14px var(--p1g);}
 .pt2.active .avatar{box-shadow:0 0 14px var(--p2g);}
 .pname{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;}
-.pt1 .pname{color:var(--p1);}.pt2 .pname{color:var(--p2);}
+.pt1 .pname{color:var(--p1);}
+.pt2 .pname{color:var(--p2);}
 .paddr{font-size:9px;color:var(--muted);font-family:monospace;}
 .cbadge{font-size:8px;padding:2px 7px;border-radius:99px;font-weight:600;
   letter-spacing:1px;text-transform:uppercase;opacity:0;transition:opacity .3s;}
 .ptag.chosen .cbadge{opacity:1;}
-.pt1 .cbadge{background:var(--p1);color:#fff;}.pt2 .cbadge{background:var(--p2);color:#fff;}
-
+.pt1 .cbadge{background:var(--p1);color:#fff;}
+.pt2 .cbadge{background:var(--p2);color:#fff;}
 .boxes-row{display:flex;align-items:flex-end;justify-content:space-around;width:100%;gap:16px;}
 .box-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;}
 .box{width:100%;max-width:148px;aspect-ratio:1;cursor:pointer;position:relative;transition:transform .15s;}
@@ -174,7 +166,8 @@ body{display:flex;flex-direction:column;align-items:center;
 .box-num{font-family:'Cinzel Decorative',serif;font-size:12px;color:var(--muted);font-weight:700;letter-spacing:1px;position:relative;z-index:1;}
 .choice-dots{display:flex;gap:6px;height:10px;align-items:center;}
 .dot{width:10px;height:10px;border-radius:50%;border:1px solid var(--border);background:transparent;transition:background .3s,border-color .3s,box-shadow .3s;}
-.dot.dp1{border-color:var(--p1);}.dot.dp2{border-color:var(--p2);}
+.dot.dp1{border-color:var(--p1);}
+.dot.dp2{border-color:var(--p2);}
 .dot.dp1.filled{background:var(--p1);box-shadow:0 0 6px var(--p1g);}
 .dot.dp2.filled{background:var(--p2);box-shadow:0 0 6px var(--p2g);}
 .box.bc1 .box-inner{border-color:var(--p1);box-shadow:0 0 20px var(--p1g);}
@@ -184,8 +177,6 @@ body{display:flex;flex-direction:column;align-items:center;
 .box.rwin .box-icon{opacity:1;font-size:50px;}
 .box.rlose .box-icon{opacity:.04;}
 .game-log{width:100%;font-size:11px;color:var(--muted);text-align:center;min-height:15px;padding-bottom:4px;}
-
-/* RESULT */
 .result-overlay{position:fixed;inset:0;background:#000000cc;backdrop-filter:blur(8px);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   z-index:200;opacity:0;pointer-events:none;transition:opacity .4s;padding:20px;}
@@ -201,21 +192,22 @@ body{display:flex;flex-direction:column;align-items:center;
   background:linear-gradient(135deg,var(--gold),#fff8d6,var(--gold-dark));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .res-winner{font-size:14px;font-weight:700;}
-.res-winner.rc1{color:var(--p1);}.res-winner.rc2{color:var(--p2);}
-
+.res-winner.rc1{color:var(--p1);}
+.res-winner.rc2{color:var(--p2);}
 .res-prizes{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:14px;
   padding:12px 14px;display:flex;flex-direction:column;gap:0;margin-top:4px;}
 .rp-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;}
 .rp-row+.rp-row{border-top:1px solid var(--border);}
 .rp-lbl{font-size:11px;color:var(--muted);}
 .rp-val{font-size:12px;font-weight:700;}
-.rp-val.gold{color:var(--gold);}.rp-val.green{color:var(--green);}.rp-val.muted{color:var(--muted);}
+.rp-val.gold{color:var(--gold);}
+.rp-val.green{color:var(--green);}
+.rp-val.muted{color:var(--muted);}
 .rp-div{height:1px;background:var(--border);margin:2px 0;}
 .rp-total-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;}
 .rp-total-lbl{font-size:12px;font-weight:600;color:var(--text);}
 .rp-total-val{font-size:14px;font-weight:700;color:var(--gold);}
 .tx-link{font-size:10px;color:var(--ton);text-decoration:none;word-break:break-all;text-align:center;}
-
 .sparkle{position:fixed;pointer-events:none;font-size:18px;animation:sparkle-fly 1s ease-out forwards;z-index:300;}
 @keyframes sparkle-fly{0%{opacity:1;transform:translate(0,0) scale(1);}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.2);}}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
@@ -230,7 +222,6 @@ body{display:flex;flex-direction:column;align-items:center;
 </head>
 <body>
 
-<!-- SCREEN 1: CONNECT -->
 <div class="screen active" id="screenConnect">
   <div class="hdr"><div class="logo">Gold Box Duel</div><div class="logo-sub">TON Testnet · Live Wagers</div></div>
   <div class="connect-card">
@@ -242,7 +233,6 @@ body{display:flex;flex-direction:column;align-items:center;
   </div>
 </div>
 
-<!-- SCREEN 2: LOBBY -->
 <div class="screen" id="screenLobby">
   <div class="hdr"><div class="logo">Gold Box Duel</div><div class="logo-sub">Set wager · Challenge opponent</div></div>
   <div style="width:100%;max-width:400px;display:flex;flex-direction:column;">
@@ -278,7 +268,6 @@ body{display:flex;flex-direction:column;align-items:center;
   </div>
 </div>
 
-<!-- SCREEN 3: WAITING -->
 <div class="screen" id="screenWaiting">
   <div class="hdr"><div class="logo">Gold Box Duel</div></div>
   <div class="waiting-card">
@@ -293,7 +282,6 @@ body{display:flex;flex-direction:column;align-items:center;
   </div>
 </div>
 
-<!-- SCREEN 4: GAME -->
 <div class="screen" id="screenGame">
   <div class="game-hdr">
     <div class="game-logo">Gold Box Duel</div>
@@ -304,14 +292,14 @@ body{display:flex;flex-direction:column;align-items:center;
     <div class="score-div">·</div>
     <div class="ps ps2"><div class="ps-lbl">Player 2</div><div class="ps-addr" id="sbAddr2">—</div><div class="ps-score" id="score2">0</div></div>
   </div>
-  <div class="turn-banner p1t" id="turnBanner">⚔️ Player 1 — Choose your box</div>
+  <div class="turn-banner p1t" id="turnBanner">⚔️ Both players — pick a box fast!</div>
   <div class="arena">
     <div class="player-row">
       <div class="ptag pt1 active" id="pt1">
         <div class="avatar">⚔️</div><div class="pname">Player 1</div>
         <div class="paddr" id="ptAddr1">—</div><div class="cbadge">Locked In</div>
       </div>
-      <div class="ptag pt2" id="pt2">
+      <div class="ptag pt2 active" id="pt2">
         <div class="avatar">🛡️</div><div class="pname">Player 2</div>
         <div class="paddr" id="ptAddr2">—</div><div class="cbadge">Locked In</div>
       </div>
@@ -331,10 +319,9 @@ body{display:flex;flex-direction:column;align-items:center;
       </div>
     </div>
   </div>
-  <div class="game-log" id="gameLog">Round begins</div>
+  <div class="game-log" id="gameLog">Both players — pick a box!</div>
 </div>
 
-<!-- RESULT OVERLAY -->
 <div class="result-overlay" id="resultOverlay">
   <div class="result-card">
     <div class="res-trophy" id="resTrophy">🏆</div>
@@ -360,58 +347,56 @@ body{display:flex;flex-direction:column;align-items:center;
 <div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════
-//  CONFIG
-// ═══════════════════════════════════════
 const HOUSE_PCT  = 0.20;
 const WINNER_PCT = 0.80;
 
-// ═══════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════
-let walletAddr = '';
-let hasChosen = false;
-let p2Addr     = '';
-let gameId     = '';
+let walletAddr   = '';
+let p2Addr       = '';
+let gameId       = '';
 let selectedWager = 0;
-let amIPlayer1 = true;      // is current user P1?
-let myTurn     = false;
-let score1 = 0, score2 = 0;
-let pollTimer  = null;
-let gameOver   = false;
+let amIPlayer1   = true;
+let hasChosen    = false;
+let score1       = 0;
+let score2       = 0;
+let pollTimer    = null;
+let gameOver     = false;
 
-// ═══════════════════════════════════════
-//  TELEGRAM + HELPERS
-// ═══════════════════════════════════════
-const tg = window.Telegram?.WebApp;
+const tg = window.Telegram && window.Telegram.WebApp;
 if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#0a0a10'); tg.setBackgroundColor('#0a0a10'); }
-const haptic  = (t='light') => tg?.HapticFeedback?.impactOccurred?.(t);
-const hapticN = (t='success') => tg?.HapticFeedback?.notificationOccurred?.(t);
-const showScreen = id => { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); };
-const short = a => a ? a.slice(0,5)+'…'+a.slice(-4) : '—';
-const setLog = m => document.getElementById('gameLog').textContent = m;
-function showToast(msg, ms=2300) {
-  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), ms);
+
+function haptic(t)  { if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred(t || 'light'); }
+function hapticN(t) { if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred(t || 'success'); }
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
 }
-async function api(path, body) {
-  const r = await fetch(path, {
+
+function short(a) { return a ? a.slice(0,5) + '…' + a.slice(-4) : '—'; }
+function setLog(m) { document.getElementById('gameLog').textContent = m; }
+
+function showToast(msg, ms) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, ms || 2300);
+}
+
+function api(path, body) {
+  return fetch(path, {
     method: body ? 'POST' : 'GET',
     headers: body ? {'Content-Type':'application/json'} : {},
     body: body ? JSON.stringify(body) : undefined,
-  });
-  return r.json();
+  }).then(function(r) { return r.json(); });
 }
 
-// ═══════════════════════════════════════
-//  CHECK FOR INVITE LINK ON LOAD
-// ═══════════════════════════════════════
-(function checkInvite() {
+// Check for invite link
+(function() {
   try {
-    const params = new URLSearchParams(window.location.search);
-    const joinId = params.get('join');
+    var params = new URLSearchParams(window.location.search);
+    var joinId = params.get('join');
     if (joinId && joinId.length > 3) {
-      gameId     = joinId;
+      gameId = joinId;
       amIPlayer1 = false;
     } else {
       amIPlayer1 = true;
@@ -421,15 +406,10 @@ async function api(path, body) {
   }
 })();
 
-// ═══════════════════════════════════════
-//  SCREEN 1 — CONNECT WALLET
-// ═══════════════════════════════════════
 function connectWallet() {
   haptic('medium');
-  // Real TON Connect
-  if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
-    const user = window.Telegram.WebApp.initDataUnsafe.user;
-    walletAddr = 'EQUser' + user.id + 'TG';
+  if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+    walletAddr = 'EQUser' + tg.initDataUnsafe.user.id + 'TG';
   } else {
     walletAddr = 'EQA' + Math.random().toString(36).slice(2,8).toUpperCase() + 'Demo';
   }
@@ -440,9 +420,7 @@ function afterConnect() {
   document.getElementById('slot1addr').textContent = short(walletAddr);
   document.getElementById('sbAddr1').textContent   = short(walletAddr);
   document.getElementById('ptAddr1').textContent   = short(walletAddr);
-
   if (!amIPlayer1) {
-    // P2 joining via invite — skip lobby, go straight to join flow
     joinAsP2();
     return;
   }
@@ -450,280 +428,249 @@ function afterConnect() {
   showScreen('screenLobby');
 }
 
-// ═══════════════════════════════════════
-//  SCREEN 2 — LOBBY (Player 1)
-// ═══════════════════════════════════════
 function selectWager(amount, el) {
   haptic('light');
   selectedWager = amount;
-  document.querySelectorAll('.wopt').forEach(e=>e.classList.remove('sel'));
+  document.querySelectorAll('.wopt').forEach(function(e) { e.classList.remove('sel'); });
   el.classList.add('sel');
-  const pot         = amount * 2;
-  const house       = +(amount * HOUSE_PCT).toFixed(2);
-  const winnerTotal = +(amount + amount * WINNER_PCT).toFixed(2);
+  var pot = amount * 2;
+  var house = +(amount * HOUSE_PCT).toFixed(2);
+  var winnerTotal = +(amount + amount * WINNER_PCT).toFixed(2);
   document.getElementById('prTotal').textContent  = pot + ' TON';
   document.getElementById('prWinner').textContent = winnerTotal + ' TON';
   document.getElementById('prHouse').textContent  = house + ' TON';
   document.getElementById('btnJoin').disabled = false;
 }
 
-async function createGame() {
+function createGame() {
   if (!selectedWager) return;
   haptic('medium');
   document.getElementById('btnJoin').disabled = true;
   document.getElementById('btnJoin').textContent = '⏳ Creating...';
-
-  // TODO: Before calling API, send wager to house wallet via TON Connect:
-  // await tonConnect.sendTransaction({ messages: [{ address: HOUSE_WALLET, amount: toNano(selectedWager) }] })
-
-  const data = await api('/api/create-game', { wager: selectedWager, p1Wallet: walletAddr });
-  if (data.error) {
-    showToast('❌ ' + data.error);
-    document.getElementById('btnJoin').disabled = false;
-    document.getElementById('btnJoin').textContent = '⚔️ Create Game & Lock Wager';
-    return;
-  }
-
-  gameId = data.gameId;
-  document.getElementById('wagerBadge').textContent = 'Stake: ' + selectedWager + ' TON each';
-  document.getElementById('shareLink').textContent  = data.inviteLink;
-  document.getElementById('wagerChipVal').textContent = selectedWager + ' TON each';
-  showScreen('screenWaiting');
-
-  // Poll for P2 joining
-  startPolling();
+  api('/api/create-game', { wager: selectedWager, p1Wallet: walletAddr }).then(function(data) {
+    if (data.error) {
+      showToast('❌ ' + data.error);
+      document.getElementById('btnJoin').disabled = false;
+      document.getElementById('btnJoin').textContent = '⚔️ Create Game & Lock Wager';
+      return;
+    }
+    gameId = data.gameId;
+    document.getElementById('wagerBadge').textContent = 'Stake: ' + selectedWager + ' TON each';
+    document.getElementById('shareLink').textContent  = data.inviteLink;
+    document.getElementById('wagerChipVal').textContent = selectedWager + ' TON each';
+    showScreen('screenWaiting');
+    startPolling();
+  });
 }
 
-// ═══════════════════════════════════════
-//  SCREEN 3 — WAITING
-// ═══════════════════════════════════════
 function copyInvite() {
   haptic('light');
-  const link = document.getElementById('shareLink').textContent;
-  navigator.clipboard?.writeText(link).catch(()=>{});
-  if (tg?.openTelegramLink) tg.openTelegramLink('https://t.me/share/url?url=' + encodeURIComponent(link) + '&text=' + encodeURIComponent('⚔️ Duel me! Stake: ' + selectedWager + ' TON'));
+  var link = document.getElementById('shareLink').textContent;
+  if (navigator.clipboard) navigator.clipboard.writeText(link).catch(function(){});
+  if (tg && tg.openTelegramLink) {
+    tg.openTelegramLink('https://t.me/share/url?url=' + encodeURIComponent(link) + '&text=' + encodeURIComponent('⚔️ Duel me! Stake: ' + selectedWager + ' TON'));
+  }
   showToast('🔗 Invite copied!');
 }
 
-async function cancelGame() {
+function cancelGame() {
   haptic('light');
   clearInterval(pollTimer);
-  // TODO: call refund endpoint / contract
-  showToast('↩️ Cancelled. Refund processing...');
-  setTimeout(()=>showScreen('screenLobby'), 1200);
+  showToast('↩️ Cancelled.');
+  setTimeout(function() { showScreen('screenLobby'); }, 1200);
 }
 
-// P2 joins via invite link
-async function joinAsP2() {
-  // Fetch game info first
-  const status = await api('/api/game-status?gameId=' + gameId);
-  if (status.error || status.status !== 'waiting') {
-    showToast('❌ Game not available: ' + (status.error || status.status));
-    showScreen('screenLobby');
-    return;
-  }
-  selectedWager = status.wager;
-
-  // TODO: P2 sends stake to house wallet via TON Connect here
-  // await tonConnect.sendTransaction(...)
-
-  const data = await api('/api/join-game', { gameId, p2Wallet: walletAddr });
-  if (data.error) { showToast('❌ ' + data.error); showScreen('screenLobby'); return; }
-
-  p2Addr = walletAddr;
-  showToast('🛡️ Joined! Game starting...');
-  startGame(data.game);
+function joinAsP2() {
+  api('/api/game-status?gameId=' + gameId).then(function(status) {
+    if (status.error || status.status !== 'waiting') {
+      showToast('❌ Game not available');
+      showScreen('screenLobby');
+      return;
+    }
+    selectedWager = status.wager;
+    api('/api/join-game', { gameId: gameId, p2Wallet: walletAddr }).then(function(data) {
+      if (data.error) { showToast('❌ ' + data.error); showScreen('screenLobby'); return; }
+      p2Addr = walletAddr;
+      showToast('🛡️ Joined! Game starting...');
+      startGame(data.game);
+    });
+  });
 }
 
-// ═══════════════════════════════════════
-//  POLLING — wait for state changes
-// ═══════════════════════════════════════
 function startPolling() {
   clearInterval(pollTimer);
-  pollTimer = setInterval(async () => {
-    const status = await api('/api/game-status?gameId=' + gameId);
-    if (!status || status.error) return;
-
-    if (status.status === 'active' && amIPlayer1) {
-      clearInterval(pollTimer);
-      p2Addr = status.p2Wallet;
-      startGame(status);
-    }
-    if (status.status === 'resolved') {
-      clearInterval(pollTimer);
-      showResolvedResult(status);
-    }
-    // If both chosen but not yet resolved, trigger resolve (P1's job)
-    if (status.status === 'active' && status.p1Choice !== null && status.p2Choice !== null && amIPlayer1) {
-      clearInterval(pollTimer);
-      const result = await api('/api/resolve-game', { gameId });
-      showResolvedResult(result);
-    }
+  pollTimer = setInterval(function() {
+    api('/api/game-status?gameId=' + gameId).then(function(status) {
+      if (!status || status.error) return;
+      if (status.status === 'active' && amIPlayer1 && !hasChosen) {
+        clearInterval(pollTimer);
+        p2Addr = status.p2Wallet;
+        startGame(status);
+      }
+      if (status.status === 'resolved') {
+        clearInterval(pollTimer);
+        showResolvedResult(status);
+      }
+      if (status.status === 'active' && status.p1Choice !== null && status.p2Choice !== null && amIPlayer1) {
+        clearInterval(pollTimer);
+        api('/api/resolve-game', { gameId: gameId }).then(function(result) {
+          showResolvedResult(result);
+        });
+      }
+    });
   }, 2000);
 }
 
-// ═══════════════════════════════════════
-//  SCREEN 4 — GAME
-// ═══════════════════════════════════════
 function startGame(game) {
-  p2Addr     = game.p2Wallet;
-  myTurn     = amIPlayer1; // P1 goes first
-  gameOver   = false;
-  hasChosen = false;
-  score1     = 0; score2 = 0;
-
-  document.getElementById('sbAddr1').textContent   = short(game.p1Wallet);
-  document.getElementById('sbAddr2').textContent   = short(game.p2Wallet);
-  document.getElementById('ptAddr1').textContent   = short(game.p1Wallet);
-  document.getElementById('ptAddr2').textContent   = short(game.p2Wallet);
+  p2Addr       = game.p2Wallet;
+  gameOver     = false;
+  hasChosen    = false;
+  score1       = 0;
+  score2       = 0;
+  document.getElementById('sbAddr1').textContent      = short(game.p1Wallet);
+  document.getElementById('sbAddr2').textContent      = short(game.p2Wallet);
+  document.getElementById('ptAddr1').textContent      = short(game.p1Wallet);
+  document.getElementById('ptAddr2').textContent      = short(game.p2Wallet);
   document.getElementById('wagerChipVal').textContent = game.wager + ' TON each';
-  document.getElementById('score1').textContent    = 0;
-  document.getElementById('score2').textContent    = 0;
-
+  document.getElementById('score1').textContent       = 0;
+  document.getElementById('score2').textContent       = 0;
   resetBoxes();
-  updateTurnBanner();
-  setLog(amIPlayer1 ? '⚔️ Your turn — choose a box!' : '🛡️ Waiting for Player 1 to choose...');
+  setLog('⚔️ Both players — pick a box fast!');
   showScreen('screenGame');
-
-  // If P2, start polling for P1's choice
   if (!amIPlayer1) startPolling();
 }
 
 function resetBoxes() {
-  for (let i=0;i<2;i++) {
-    const b=document.getElementById('box'+i);
-    b.className='box';
-    b.querySelector('.box-icon').textContent='📦';
-    document.getElementById('d'+i+'p1').classList.remove('filled');
-    document.getElementById('d'+i+'p2').classList.remove('filled');
+  for (var i = 0; i < 2; i++) {
+    var b = document.getElementById('box' + i);
+    b.className = 'box';
+    b.querySelector('.box-icon').textContent = '📦';
+    document.getElementById('d' + i + 'p1').classList.remove('filled');
+    document.getElementById('d' + i + 'p2').classList.remove('filled');
   }
-  document.getElementById('pt1').className='ptag pt1'+(amIPlayer1?' active':'');
-  document.getElementById('pt2').className='ptag pt2'+(!amIPlayer1?' active':'');
+  document.getElementById('pt1').className = 'ptag pt1 active';
+  document.getElementById('pt2').className = 'ptag pt2 active';
+  document.getElementById('turnBanner').className = 'turn-banner p1t';
+  document.getElementById('turnBanner').textContent = '⚔️ Both players — pick a box fast!';
 }
 
-function updateTurnBanner() {
-  const b = document.getElementById('turnBanner');
-  if (!hasChosen) {
-    b.className='turn-banner p1t';
-    b.textContent='⚔️ Both players — pick a box fast!';
-  } else {
-    b.className='turn-banner wait';
-    b.textContent='⏳ Waiting for opponent...';
-  }
-}
-
-async function chooseBox(idx) {
+function chooseBox(idx) {
   if (gameOver || hasChosen) return;
   hasChosen = true;
   haptic('light');
 
-  const cls   = amIPlayer1 ? 'bc1' : 'bc2';
-  const dotId = 'd' + idx + (amIPlayer1 ? 'p1' : 'p2');
+  var cls   = amIPlayer1 ? 'bc1' : 'bc2';
+  var dotId = 'd' + idx + (amIPlayer1 ? 'p1' : 'p2');
 
-  document.getElementById('box'+idx).classList.add(cls);
+  document.getElementById('box' + idx).classList.add(cls);
   document.getElementById(dotId).classList.add('filled');
   document.getElementById('box0').classList.add('disabled');
   document.getElementById('box1').classList.add('disabled');
 
-  const myTag = document.getElementById(amIPlayer1?'pt1':'pt2');
-  myTag.classList.remove('active'); myTag.classList.add('chosen');
-  setLog('✅ Box '+(idx===0?'I':'II')+' locked in — waiting for opponent...');
+  var myTag = document.getElementById(amIPlayer1 ? 'pt1' : 'pt2');
+  myTag.classList.remove('active');
+  myTag.classList.add('chosen');
 
-  const data = await api('/api/submit-choice', { gameId, wallet: walletAddr, choice: idx });
-  if (data.error) {
-    showToast('❌ ' + data.error);
-    hasChosen = false;
-    document.getElementById('box0').classList.remove('disabled');
-    document.getElementById('box1').classList.remove('disabled');
-    return;
-  }
+  document.getElementById('turnBanner').className = 'turn-banner wait';
+  document.getElementById('turnBanner').textContent = '⏳ Waiting for opponent...';
+  setLog('✅ Box ' + (idx === 0 ? 'I' : 'II') + ' locked in — waiting for opponent...');
 
-  if (data.ready) {
-    if (amIPlayer1) {
-      const result = await api('/api/resolve-game', { gameId });
-      showResolvedResult(result);
+  api('/api/submit-choice', { gameId: gameId, wallet: walletAddr, choice: idx }).then(function(data) {
+    if (data.error) {
+      showToast('❌ ' + data.error);
+      hasChosen = false;
+      document.getElementById('box0').classList.remove('disabled');
+      document.getElementById('box1').classList.remove('disabled');
+      return;
+    }
+    if (data.ready) {
+      if (amIPlayer1) {
+        api('/api/resolve-game', { gameId: gameId }).then(function(result) {
+          showResolvedResult(result);
+        });
+      } else {
+        setLog('⏳ Resolving on-chain...');
+        startPolling();
+      }
     } else {
-      setLog('⏳ Resolving on-chain...');
       startPolling();
     }
-  } else {
-    startPolling();
-  }
+  });
 }
- 
 
 function showResolvedResult(result) {
   clearInterval(pollTimer);
   if (!result || result.error) { showToast('❌ Error resolving game'); return; }
 
-  const winnerWallet = result.winner;
-  const isIWinner    = winnerWallet === walletAddr;
+  var winnerWallet = result.winner;
+  var isIWinner    = winnerWallet === walletAddr;
 
-  // Animate boxes
-  document.getElementById('box'+result.goldBox).classList.add('rwin');
-  document.getElementById('box'+result.goldBox).querySelector('.box-icon').textContent = '🪙';
-  document.getElementById('box'+(result.goldBox===0?1:0)).classList.add('rlose');
+  document.getElementById('box' + result.goldBox).classList.add('rwin');
+  document.getElementById('box' + result.goldBox).querySelector('.box-icon').textContent = '🪙';
+  document.getElementById('box' + (result.goldBox === 0 ? 1 : 0)).classList.add('rlose');
 
-  // Scores
-  if (winnerWallet === result.p1Wallet) { score1++; }
-  else { score2++; }
+  if (winnerWallet === result.p1Wallet) { score1++; } else { score2++; }
   document.getElementById('score1').textContent = score1;
   document.getElementById('score2').textContent = score2;
 
-  // Result card
-  const w = selectedWager;
-  document.getElementById('resTrophy').textContent   = isIWinner ? '🏆' : '😔';
-  document.getElementById('resHeadline').textContent = isIWinner ? 'You Won!' : 'You Lost';
-  document.getElementById('resWinner').textContent   = short(winnerWallet) + (isIWinner ? ' — That\'s you! 🎉' : '');
-  document.getElementById('resWinner').className     = 'res-winner ' + (winnerWallet === result.p1Wallet ? 'rc1' : 'rc2');
-  document.getElementById('rpTotal').textContent     = (w * 2) + ' TON';
-  document.getElementById('rpStake').textContent     = w + ' TON';
-  document.getElementById('rpBonus').textContent     = '+' + (w * WINNER_PCT).toFixed(2) + ' TON';
-  document.getElementById('rpHouse').textContent     = (w * HOUSE_PCT).toFixed(2) + ' TON';
-  document.getElementById('rpReceives').textContent  = result.winnerReceives + ' TON';
+  var w = selectedWager;
+  document.getElementById('resTrophy').textContent    = isIWinner ? '🏆' : '😔';
+  document.getElementById('resHeadline').textContent  = isIWinner ? 'You Won!' : 'You Lost';
+  document.getElementById('resWinner').textContent    = short(winnerWallet) + (isIWinner ? ' — That\'s you! 🎉' : '');
+  document.getElementById('resWinner').className      = 'res-winner ' + (winnerWallet === result.p1Wallet ? 'rc1' : 'rc2');
+  document.getElementById('rpTotal').textContent      = (w * 2) + ' TON';
+  document.getElementById('rpStake').textContent      = w + ' TON';
+  document.getElementById('rpBonus').textContent      = '+' + (w * WINNER_PCT).toFixed(2) + ' TON';
+  document.getElementById('rpHouse').textContent      = (w * HOUSE_PCT).toFixed(2) + ' TON';
+  document.getElementById('rpReceives').textContent   = result.winnerReceives + ' TON';
 
-  // TX link
-  const txEl   = document.getElementById('txStatusEl');
-  const txLink = document.getElementById('txLink');
+  var txEl   = document.getElementById('txStatusEl');
+  var txLink = document.getElementById('txLink');
   if (result.txHash && result.txHash !== 'pending') {
-    txEl.innerHTML  = '✅ Transaction confirmed on TON Testnet';
+    txEl.innerHTML   = '✅ Transaction confirmed on TON Testnet';
     txEl.style.color = 'var(--green)';
-    txLink.href     = 'https://testnet.tonscan.org/tx/' + result.txHash;
+    txLink.href      = 'https://testnet.tonscan.org/tx/' + result.txHash;
     txLink.style.display = 'block';
   } else {
-    setTimeout(() => {
+    setTimeout(function() {
       txEl.innerHTML   = '✅ Confirmed on TON Testnet';
       txEl.style.color = 'var(--green)';
     }, 3000);
   }
 
-  if (isIWinner) { spawnSparkles(); hapticN('success'); }
-  else           { hapticN('error'); }
+  if (isIWinner) { spawnSparkles(); hapticN('success'); } else { hapticN('error'); }
   gameOver = true;
-  setTimeout(() => document.getElementById('resultOverlay').classList.add('show'), 600);
+  setTimeout(function() { document.getElementById('resultOverlay').classList.add('show'); }, 600);
 }
 
 function spawnSparkles() {
-  const e=['✨','⭐','💫','🌟','💰','🪙'];
-  for(let i=0;i<18;i++) setTimeout(()=>{
-    const el=document.createElement('div'); el.className='sparkle';
-    el.textContent=e[Math.floor(Math.random()*e.length)];
-    el.style.left=(20+Math.random()*(window.innerWidth-40))+'px';
-    el.style.top=(window.innerHeight*.2+Math.random()*(window.innerHeight*.55))+'px';
-    const a=Math.random()*Math.PI*2,d=50+Math.random()*110;
-    el.style.setProperty('--dx',Math.cos(a)*d+'px');
-    el.style.setProperty('--dy',Math.sin(a)*d+'px');
-    document.body.appendChild(el); setTimeout(()=>el.remove(),1100);
-  },i*55);
+  var e = ['✨','⭐','💫','🌟','💰','🪙'];
+  for (var i = 0; i < 18; i++) {
+    (function(i) {
+      setTimeout(function() {
+        var el = document.createElement('div');
+        el.className = 'sparkle';
+        el.textContent = e[Math.floor(Math.random() * e.length)];
+        el.style.left = (20 + Math.random() * (window.innerWidth - 40)) + 'px';
+        el.style.top  = (window.innerHeight * .2 + Math.random() * (window.innerHeight * .55)) + 'px';
+        var a = Math.random() * Math.PI * 2;
+        var d = 50 + Math.random() * 110;
+        el.style.setProperty('--dx', Math.cos(a) * d + 'px');
+        el.style.setProperty('--dy', Math.sin(a) * d + 'px');
+        document.body.appendChild(el);
+        setTimeout(function() { el.remove(); }, 1100);
+      }, i * 55);
+    })(i);
+  }
 }
 
 function playAgain() {
   haptic('medium');
   document.getElementById('resultOverlay').classList.remove('show');
-  // Reset for new round — both players must reconnect with new game
   showToast('Create a new game to play again!');
-  setTimeout(()=>showScreen('screenLobby'), 400);
+  setTimeout(function() { showScreen('screenLobby'); }, 400);
 }
+
 function goLobby() {
   haptic('light');
   document.getElementById('resultOverlay').classList.remove('show');
