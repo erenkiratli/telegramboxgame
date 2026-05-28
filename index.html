@@ -370,6 +370,7 @@ const WINNER_PCT = 0.80;
 //  STATE
 // ═══════════════════════════════════════
 let walletAddr = '';
+let hasChosen = false;
 let p2Addr     = '';
 let gameId     = '';
 let selectedWager = 0;
@@ -564,6 +565,7 @@ function startGame(game) {
   p2Addr     = game.p2Wallet;
   myTurn     = amIPlayer1; // P1 goes first
   gameOver   = false;
+  hasChosen = false;
   score1     = 0; score2 = 0;
 
   document.getElementById('sbAddr1').textContent   = short(game.p1Wallet);
@@ -587,7 +589,6 @@ function resetBoxes() {
   for (let i=0;i<2;i++) {
     const b=document.getElementById('box'+i);
     b.className='box';
-    if (!myTurn) b.classList.add('disabled');
     b.querySelector('.box-icon').textContent='📦';
     document.getElementById('d'+i+'p1').classList.remove('filled');
     document.getElementById('d'+i+'p2').classList.remove('filled');
@@ -598,14 +599,53 @@ function resetBoxes() {
 
 function updateTurnBanner() {
   const b = document.getElementById('turnBanner');
-  if (myTurn && amIPlayer1)  { b.className='turn-banner p1t'; b.textContent='⚔️ Your turn — pick a box!'; }
-  else if (myTurn && !amIPlayer1) { b.className='turn-banner p2t'; b.textContent='🛡️ Your turn — pick the other box!'; }
-  else if (amIPlayer1)  { b.className='turn-banner wait'; b.textContent='🛡️ Waiting for Player 2...'; }
-  else                  { b.className='turn-banner wait'; b.textContent='⚔️ Waiting for Player 1...'; }
+  if (!hasChosen) {
+    b.className='turn-banner p1t';
+    b.textContent='⚔️ Both players — pick a box fast!';
+  } else {
+    b.className='turn-banner wait';
+    b.textContent='⏳ Waiting for opponent...';
+  }
 }
 
 async function chooseBox(idx) {
-  if (gameOver || !myTurn) return;
+  if (gameOver || hasChosen) return;
+  hasChosen = true;
+  haptic('light');
+
+  const cls   = amIPlayer1 ? 'bc1' : 'bc2';
+  const dotId = 'd' + idx + (amIPlayer1 ? 'p1' : 'p2');
+
+  document.getElementById('box'+idx).classList.add(cls);
+  document.getElementById(dotId).classList.add('filled');
+  document.getElementById('box0').classList.add('disabled');
+  document.getElementById('box1').classList.add('disabled');
+
+  const myTag = document.getElementById(amIPlayer1?'pt1':'pt2');
+  myTag.classList.remove('active'); myTag.classList.add('chosen');
+  setLog('✅ Box '+(idx===0?'I':'II')+' locked in — waiting for opponent...');
+
+  const data = await api('/api/submit-choice', { gameId, wallet: walletAddr, choice: idx });
+  if (data.error) {
+    showToast('❌ ' + data.error);
+    hasChosen = false;
+    document.getElementById('box0').classList.remove('disabled');
+    document.getElementById('box1').classList.remove('disabled');
+    return;
+  }
+
+  if (data.ready) {
+    if (amIPlayer1) {
+      const result = await api('/api/resolve-game', { gameId });
+      showResolvedResult(result);
+    } else {
+      setLog('⏳ Resolving on-chain...');
+      startPolling();
+    }
+  } else {
+    startPolling();
+  }
+}
   haptic('light');
 
   const playerNum = amIPlayer1 ? 1 : 2;
