@@ -75,7 +75,8 @@ module.exports = async function handler(req, res) {
         await sendMessage(chatId,
           `🪙 <b>Gold Box Duel</b>\n\n` +
           `Two players. Two boxes. One holds the gold.\n` +
-          `Pick differently — the one who finds gold wins!\n\n` +
+          `Pick differently — the one who finds gold wins!\n` +
+          `Fastest game to make money. Make money in 2 seconds!\n\n` +
           `💎 Wagers: 5 · 10 · 25 · 50 · 100 TON\n` +
           `🏆 Winner gets: own stake + 80% of loser's\n` +
           `🏛 House fee: 20% of loser's stake\n\n` +
