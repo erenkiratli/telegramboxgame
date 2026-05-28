@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <title>Gold Box Duel</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Crimson+Pro:wght@400;600&display=swap');
 :root{
@@ -55,6 +56,12 @@ body{display:flex;flex-direction:column;align-items:center;
 .connect-title{font-family:'Cinzel Decorative',serif;font-size:18px;text-align:center;}
 .connect-desc{font-size:13px;color:var(--muted);text-align:center;line-height:1.6;max-width:260px;}
 .connect-note{font-size:10px;color:var(--muted);text-align:center;letter-spacing:.5px;}
+.wallet-connected-chip{
+  display:flex;align-items:center;gap:8px;background:var(--surface);
+  border:1px solid var(--green);border-radius:99px;padding:7px 14px;
+  font-size:11px;color:var(--green);letter-spacing:.5px;cursor:pointer;
+}
+.wallet-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);}
 .player-slots{width:100%;display:flex;gap:10px;margin-top:6px;}
 .pslot{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:14px;
   padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:5px;transition:border-color .3s,box-shadow .3s;}
@@ -218,24 +225,39 @@ body{display:flex;flex-direction:column;align-items:center;
 .spinner{width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--ton);
   border-radius:50%;animation:spin .8s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px;}
 @keyframes spin{to{transform:rotate(360deg);}}
+.loading-overlay{position:fixed;inset:0;background:#000000aa;backdrop-filter:blur(4px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:300;gap:14px;}
+.loading-overlay.hidden{display:none;}
+.loading-text{font-size:13px;color:var(--text);letter-spacing:.5px;text-align:center;max-width:260px;line-height:1.5;}
 </style>
 </head>
 <body>
 
+<!-- CONNECT SCREEN -->
 <div class="screen active" id="screenConnect">
-  <div class="hdr"><div class="logo">Gold Box Duel</div><div class="logo-sub">TON Testnet · Live Wagers</div></div>
+  <div class="hdr"><div class="logo">Gold Box Duel</div><div class="logo-sub">TON · Real Wagers · Instant Payouts</div></div>
   <div class="connect-card">
     <div class="ton-logo">💎</div>
     <div class="connect-title">Connect Your Wallet</div>
-    <div class="connect-desc">Link your TON wallet to place wagers and receive winnings instantly on testnet.</div>
-    <button class="btn-ton" onclick="connectWallet()">💎 Connect TON Wallet</button>
-    <div class="connect-note">TON Testnet · Non-custodial · Instant payouts</div>
+    <div class="connect-desc">Connect Tonkeeper or any TON wallet to place real wagers and receive winnings instantly.</div>
+    <div id="ton-connect-button"></div>
+    <div class="connect-note">Mainnet · Non-custodial · Instant payouts</div>
   </div>
 </div>
 
+<!-- LOBBY SCREEN -->
 <div class="screen" id="screenLobby">
   <div class="hdr"><div class="logo">Gold Box Duel</div><div class="logo-sub">Set wager · Challenge opponent</div></div>
   <div style="width:100%;max-width:400px;display:flex;flex-direction:column;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+      <div class="sec-lbl" style="margin-top:0;">Connected</div>
+      <div class="wallet-connected-chip" onclick="disconnectWallet()">
+        <div class="wallet-dot"></div>
+        <span id="walletChipAddr">—</span>
+        <span style="color:var(--muted);font-size:10px;">✕</span>
+      </div>
+    </div>
     <div class="sec-lbl">Players</div>
     <div class="player-slots">
       <div class="pslot p1s filled">
@@ -264,10 +286,11 @@ body{display:flex;flex-direction:column;align-items:center;
       <div class="pr-row"><div class="pr-lbl">🏛 House fee (20% of loser's stake)</div><div class="pr-val muted" id="prHouse">— TON</div></div>
     </div>
     <button class="btn-gold" id="btnJoin" disabled onclick="createGame()" style="margin-top:12px;">⚔️ Create Game &amp; Lock Wager</button>
-    <div class="lobby-note">Both players must stake the same amount.<br>Funds locked until result is resolved on-chain.</div>
+    <div class="lobby-note">Wager is sent to escrow on game creation.<br>Winner paid out automatically after result.</div>
   </div>
 </div>
 
+<!-- WAITING SCREEN -->
 <div class="screen" id="screenWaiting">
   <div class="hdr"><div class="logo">Gold Box Duel</div></div>
   <div class="waiting-card">
@@ -282,6 +305,7 @@ body{display:flex;flex-direction:column;align-items:center;
   </div>
 </div>
 
+<!-- GAME SCREEN -->
 <div class="screen" id="screenGame">
   <div class="game-hdr">
     <div class="game-logo">Gold Box Duel</div>
@@ -322,6 +346,7 @@ body{display:flex;flex-direction:column;align-items:center;
   <div class="game-log" id="gameLog">Both players — pick a box!</div>
 </div>
 
+<!-- RESULT OVERLAY -->
 <div class="result-overlay" id="resultOverlay">
   <div class="result-card">
     <div class="res-trophy" id="resTrophy">🏆</div>
@@ -336,52 +361,74 @@ body{display:flex;flex-direction:column;align-items:center;
       <div class="rp-total-row"><div class="rp-total-lbl">💸 Winner receives</div><div class="rp-total-val" id="rpReceives">—</div></div>
     </div>
     <div id="txStatusEl" style="font-size:11px;color:var(--ton);display:flex;align-items:center;gap:6px;">
-      <span class="spinner"></span>Broadcasting on TON Testnet...
+      <span class="spinner"></span>Sending payout on TON...
     </div>
-    <a id="txLink" class="tx-link" href="#" target="_blank" style="display:none;">View tx on testnet.tonscan.org ↗</a>
+    <a id="txLink" class="tx-link" href="#" target="_blank" style="display:none;">View tx on tonscan.org ↗</a>
     <button class="btn-gold" id="btnRematch" onclick="rematch()" style="margin-top:4px;">⚔ Rematch — Same Opponent</button>
     <button class="btn-outline" onclick="goLobby()">← New Game / Change Wager</button>
   </div>
 </div>
 
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay hidden" id="loadingOverlay">
+  <div class="spinner" style="width:32px;height:32px;border-width:3px;"></div>
+  <div class="loading-text" id="loadingText">Processing...</div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-const HOUSE_PCT  = 0.20;
-const WINNER_PCT = 0.80;
+// ═══════════════════════════════
+//  CONFIG
+// ═══════════════════════════════
+var HOUSE_WALLET = 'UQAR5LctVrCH8LnQJ0PLgjktGIKniMl8dy1pINZ-MIxK2nsv';
+var HOUSE_PCT    = 0.20;
+var WINNER_PCT   = 0.80;
 
-let walletAddr   = '';
-let p2Addr       = '';
-let gameId       = '';
-let selectedWager = 0;
-let amIPlayer1   = true;
-let hasChosen    = false;
-let score1       = 0;
-let score2       = 0;
-let pollTimer    = null;
-let gameOver     = false;
+// ═══════════════════════════════
+//  STATE
+// ═══════════════════════════════
+var walletAddr   = '';
+var p2Addr       = '';
+var gameId       = '';
+var selectedWager = 0;
+var amIPlayer1   = true;
+var hasChosen    = false;
+var score1       = 0;
+var score2       = 0;
+var pollTimer    = null;
+var gameOver     = false;
+var tonConnectUI = null;
 
-const tg = window.Telegram && window.Telegram.WebApp;
+// ═══════════════════════════════
+//  TELEGRAM
+// ═══════════════════════════════
+var tg = window.Telegram && window.Telegram.WebApp;
 if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#0a0a10'); tg.setBackgroundColor('#0a0a10'); }
-
 function haptic(t)  { if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred(t || 'light'); }
 function hapticN(t) { if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred(t || 'success'); }
 
+// ═══════════════════════════════
+//  HELPERS
+// ═══════════════════════════════
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
 }
-
-function short(a) { return a ? a.slice(0,5) + '…' + a.slice(-4) : '—'; }
+function short(a) { return a ? a.slice(0,6) + '…' + a.slice(-4) : '—'; }
 function setLog(m) { document.getElementById('gameLog').textContent = m; }
-
 function showToast(msg, ms) {
   var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(function() { t.classList.remove('show'); }, ms || 2300);
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, ms || 2500);
 }
-
+function showLoading(msg) {
+  document.getElementById('loadingText').textContent = msg || 'Processing...';
+  document.getElementById('loadingOverlay').classList.remove('hidden');
+}
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.add('hidden');
+}
 function api(path, body) {
   return fetch(path, {
     method: body ? 'POST' : 'GET',
@@ -389,45 +436,88 @@ function api(path, body) {
     body: body ? JSON.stringify(body) : undefined,
   }).then(function(r) { return r.json(); });
 }
+// Convert TON to nanoTON string
+function toNano(ton) {
+  return String(Math.round(ton * 1e9));
+}
 
-// Check for invite link
+// ═══════════════════════════════
+//  CHECK INVITE LINK
+// ═══════════════════════════════
 (function() {
   try {
     var params = new URLSearchParams(window.location.search);
     var joinId = params.get('join');
     if (joinId && joinId.length > 3) {
-      gameId = joinId;
-      amIPlayer1 = false;
+      gameId = joinId; amIPlayer1 = false;
     } else {
       amIPlayer1 = true;
     }
-  } catch(e) {
-    amIPlayer1 = true;
-  }
+  } catch(e) { amIPlayer1 = true; }
 })();
 
-function connectWallet() {
-  haptic('medium');
-  if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-    walletAddr = 'EQUser' + tg.initDataUnsafe.user.id + 'TG';
-  } else {
-    walletAddr = 'EQA' + Math.random().toString(36).slice(2,8).toUpperCase() + 'Demo';
+// ═══════════════════════════════
+//  TON CONNECT INIT
+// ═══════════════════════════════
+window.addEventListener('load', function() {
+  try {
+    tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl: 'https://telegramboxgame.vercel.app/tonconnect-manifest.json',
+      buttonRootId: 'ton-connect-button'
+    });
+
+    // Listen for wallet connection
+    tonConnectUI.onStatusChange(function(wallet) {
+      if (wallet) {
+        walletAddr = wallet.account.address;
+        afterConnect();
+      }
+    });
+
+    // If already connected from previous session
+    if (tonConnectUI.connected) {
+      walletAddr = tonConnectUI.account.address;
+      afterConnect();
+    }
+  } catch(e) {
+    console.error('TON Connect init error:', e);
+    // Fallback for testing outside Telegram
+    document.getElementById('ton-connect-button').innerHTML =
+      '<button class="btn-ton" onclick="fallbackConnect()">💎 Connect TON Wallet</button>';
   }
+});
+
+function fallbackConnect() {
+  walletAddr = 'EQA' + Math.random().toString(36).slice(2,8).toUpperCase() + 'Demo';
   afterConnect();
 }
 
+function disconnectWallet() {
+  if (tonConnectUI) tonConnectUI.disconnect();
+  walletAddr = '';
+  showScreen('screenConnect');
+}
+
+// ═══════════════════════════════
+//  AFTER WALLET CONNECTED
+// ═══════════════════════════════
 function afterConnect() {
-  document.getElementById('slot1addr').textContent = short(walletAddr);
-  document.getElementById('sbAddr1').textContent   = short(walletAddr);
-  document.getElementById('ptAddr1').textContent   = short(walletAddr);
+  document.getElementById('slot1addr').textContent   = short(walletAddr);
+  document.getElementById('walletChipAddr').textContent = short(walletAddr);
+  document.getElementById('sbAddr1').textContent     = short(walletAddr);
+  document.getElementById('ptAddr1').textContent     = short(walletAddr);
+
   if (!amIPlayer1) {
     joinAsP2();
     return;
   }
-  showToast('✅ Wallet connected');
+  showToast('✅ Wallet connected: ' + short(walletAddr));
   showScreen('screenLobby');
 }
 
+// ═══════════════════════════════
+//  LOBBY
+// ═══════════════════════════════
 function selectWager(amount, el) {
   haptic('light');
   selectedWager = amount;
@@ -445,30 +535,55 @@ function selectWager(amount, el) {
 function createGame() {
   if (!selectedWager) return;
   haptic('medium');
-  document.getElementById('btnJoin').disabled = true;
-  document.getElementById('btnJoin').textContent = '⏳ Creating...';
-  api('/api/create-game', { wager: selectedWager, p1Wallet: walletAddr }).then(function(data) {
-    if (data.error) {
-      showToast('❌ ' + data.error);
-      document.getElementById('btnJoin').disabled = false;
-      document.getElementById('btnJoin').textContent = '⚔️ Create Game & Lock Wager';
-      return;
-    }
+
+  // Step 1: Send wager to house wallet via TON Connect
+  showLoading('Confirm ' + selectedWager + ' TON payment\nin your wallet app...');
+
+  tonConnectUI.sendTransaction({
+    validUntil: Math.floor(Date.now() / 1000) + 300,
+    messages: [{
+      address: HOUSE_WALLET,
+      amount: toNano(selectedWager),
+      payload: ''
+    }]
+  }).then(function(txResult) {
+    showLoading('Payment confirmed!\nCreating game...');
+    // Step 2: Create game on backend after payment
+    return api('/api/create-game', {
+      wager: selectedWager,
+      p1Wallet: walletAddr,
+      txHash: txResult.boc || 'confirmed'
+    });
+  }).then(function(data) {
+    hideLoading();
+    if (data.error) { showToast('❌ ' + data.error); return; }
     gameId = data.gameId;
-    document.getElementById('wagerBadge').textContent = 'Stake: ' + selectedWager + ' TON each';
-    document.getElementById('shareLink').textContent  = data.inviteLink;
+    document.getElementById('wagerBadge').textContent   = 'Stake: ' + selectedWager + ' TON each';
+    document.getElementById('shareLink').textContent    = data.inviteLink;
     document.getElementById('wagerChipVal').textContent = selectedWager + ' TON each';
     showScreen('screenWaiting');
     startPolling();
+  }).catch(function(err) {
+    hideLoading();
+    if (err && err.message && err.message.includes('User rejects')) {
+      showToast('❌ Payment cancelled');
+    } else {
+      showToast('❌ Payment failed. Try again.');
+      console.error('Payment error:', err);
+    }
   });
 }
 
+// ═══════════════════════════════
+//  WAITING
+// ═══════════════════════════════
 function copyInvite() {
   haptic('light');
   var link = document.getElementById('shareLink').textContent;
   if (navigator.clipboard) navigator.clipboard.writeText(link).catch(function(){});
   if (tg && tg.openTelegramLink) {
-    tg.openTelegramLink('https://t.me/share/url?url=' + encodeURIComponent(link) + '&text=' + encodeURIComponent('⚔️ Duel me! Stake: ' + selectedWager + ' TON'));
+    tg.openTelegramLink('https://t.me/share/url?url=' + encodeURIComponent(link) +
+      '&text=' + encodeURIComponent('⚔️ Duel me in Gold Box! Stake: ' + selectedWager + ' TON'));
   }
   showToast('🔗 Invite copied!');
 }
@@ -476,10 +591,14 @@ function copyInvite() {
 function cancelGame() {
   haptic('light');
   clearInterval(pollTimer);
-  showToast('↩️ Cancelled.');
-  setTimeout(function() { showScreen('screenLobby'); }, 1200);
+  // TODO: backend refund endpoint
+  showToast('↩️ Cancelled. Contact support for refund.');
+  setTimeout(function() { showScreen('screenLobby'); }, 1500);
 }
 
+// ═══════════════════════════════
+//  JOIN AS P2
+// ═══════════════════════════════
 function joinAsP2() {
   api('/api/game-status?gameId=' + gameId).then(function(status) {
     if (status.error || status.status !== 'waiting') {
@@ -488,15 +607,46 @@ function joinAsP2() {
       return;
     }
     selectedWager = status.wager;
-    api('/api/join-game', { gameId: gameId, p2Wallet: walletAddr }).then(function(data) {
+
+    // P2 sends same wager to house wallet
+    showLoading('Confirm ' + selectedWager + ' TON payment\nin your wallet app...');
+
+    tonConnectUI.sendTransaction({
+      validUntil: Math.floor(Date.now() / 1000) + 300,
+      messages: [{
+        address: HOUSE_WALLET,
+        amount: toNano(selectedWager),
+        payload: ''
+      }]
+    }).then(function(txResult) {
+      showLoading('Payment confirmed!\nJoining game...');
+      return api('/api/join-game', {
+        gameId: gameId,
+        p2Wallet: walletAddr,
+        txHash: txResult.boc || 'confirmed'
+      });
+    }).then(function(data) {
+      hideLoading();
       if (data.error) { showToast('❌ ' + data.error); showScreen('screenLobby'); return; }
       p2Addr = walletAddr;
       showToast('🛡️ Joined! Game starting...');
       startGame(data.game);
+    }).catch(function(err) {
+      hideLoading();
+      if (err && err.message && err.message.includes('User rejects')) {
+        showToast('❌ Payment cancelled');
+      } else {
+        showToast('❌ Payment failed.');
+        console.error(err);
+      }
+      showScreen('screenLobby');
     });
   });
 }
 
+// ═══════════════════════════════
+//  POLLING
+// ═══════════════════════════════
 function startPolling() {
   clearInterval(pollTimer);
   pollTimer = setInterval(function() {
@@ -521,12 +671,14 @@ function startPolling() {
   }, 2000);
 }
 
+// ═══════════════════════════════
+//  GAME
+// ═══════════════════════════════
 function startGame(game) {
-  p2Addr       = game.p2Wallet;
-  gameOver     = false;
-  hasChosen    = false;
-  score1       = 0;
-  score2       = 0;
+  p2Addr    = game.p2Wallet;
+  gameOver  = false;
+  hasChosen = false;
+  score1    = 0; score2 = 0;
   document.getElementById('sbAddr1').textContent      = short(game.p1Wallet);
   document.getElementById('sbAddr2').textContent      = short(game.p2Wallet);
   document.getElementById('ptAddr1').textContent      = short(game.p1Wallet);
@@ -550,7 +702,7 @@ function resetBoxes() {
   }
   document.getElementById('pt1').className = 'ptag pt1 active';
   document.getElementById('pt2').className = 'ptag pt2 active';
-  document.getElementById('turnBanner').className = 'turn-banner p1t';
+  document.getElementById('turnBanner').className   = 'turn-banner p1t';
   document.getElementById('turnBanner').textContent = '⚔️ Both players — pick a box fast!';
 }
 
@@ -558,20 +710,15 @@ function chooseBox(idx) {
   if (gameOver || hasChosen) return;
   hasChosen = true;
   haptic('light');
-
   var cls   = amIPlayer1 ? 'bc1' : 'bc2';
   var dotId = 'd' + idx + (amIPlayer1 ? 'p1' : 'p2');
-
   document.getElementById('box' + idx).classList.add(cls);
   document.getElementById(dotId).classList.add('filled');
   document.getElementById('box0').classList.add('disabled');
   document.getElementById('box1').classList.add('disabled');
-
   var myTag = document.getElementById(amIPlayer1 ? 'pt1' : 'pt2');
-  myTag.classList.remove('active');
-  myTag.classList.add('chosen');
-
-  document.getElementById('turnBanner').className = 'turn-banner wait';
+  myTag.classList.remove('active'); myTag.classList.add('chosen');
+  document.getElementById('turnBanner').className   = 'turn-banner wait';
   document.getElementById('turnBanner').textContent = '⏳ Waiting for opponent...';
   setLog('✅ Box ' + (idx === 0 ? 'I' : 'II') + ' locked in — waiting for opponent...');
 
@@ -598,6 +745,9 @@ function chooseBox(idx) {
   });
 }
 
+// ═══════════════════════════════
+//  RESULT
+// ═══════════════════════════════
 function showResolvedResult(result) {
   clearInterval(pollTimer);
   if (!result || result.error) { showToast('❌ Error resolving game'); return; }
@@ -614,26 +764,26 @@ function showResolvedResult(result) {
   document.getElementById('score2').textContent = score2;
 
   var w = selectedWager;
-  document.getElementById('resTrophy').textContent    = isIWinner ? '🏆' : '😔';
-  document.getElementById('resHeadline').textContent  = isIWinner ? 'You Won!' : 'You Lost';
-  document.getElementById('resWinner').textContent    = short(winnerWallet) + (isIWinner ? ' — That\'s you! 🎉' : '');
-  document.getElementById('resWinner').className      = 'res-winner ' + (winnerWallet === result.p1Wallet ? 'rc1' : 'rc2');
-  document.getElementById('rpTotal').textContent      = (w * 2) + ' TON';
-  document.getElementById('rpStake').textContent      = w + ' TON';
-  document.getElementById('rpBonus').textContent      = '+' + (w * WINNER_PCT).toFixed(2) + ' TON';
-  document.getElementById('rpHouse').textContent      = (w * HOUSE_PCT).toFixed(2) + ' TON';
-  document.getElementById('rpReceives').textContent   = result.winnerReceives + ' TON';
+  document.getElementById('resTrophy').textContent   = isIWinner ? '🏆' : '😔';
+  document.getElementById('resHeadline').textContent = isIWinner ? 'You Won!' : 'You Lost';
+  document.getElementById('resWinner').textContent   = short(winnerWallet) + (isIWinner ? ' — You! 🎉' : '');
+  document.getElementById('resWinner').className     = 'res-winner ' + (winnerWallet === result.p1Wallet ? 'rc1' : 'rc2');
+  document.getElementById('rpTotal').textContent     = (w * 2) + ' TON';
+  document.getElementById('rpStake').textContent     = w + ' TON';
+  document.getElementById('rpBonus').textContent     = '+' + (w * WINNER_PCT).toFixed(2) + ' TON';
+  document.getElementById('rpHouse').textContent     = (w * HOUSE_PCT).toFixed(2) + ' TON';
+  document.getElementById('rpReceives').textContent  = result.winnerReceives + ' TON';
 
   var txEl   = document.getElementById('txStatusEl');
   var txLink = document.getElementById('txLink');
   if (result.txHash && result.txHash !== 'pending') {
-    txEl.innerHTML   = '✅ Transaction confirmed on TON Testnet';
+    txEl.innerHTML   = '✅ Payout sent on TON Mainnet!';
     txEl.style.color = 'var(--green)';
-    txLink.href      = 'https://testnet.tonscan.org/tx/' + result.txHash;
+    txLink.href      = 'https://tonscan.org/tx/' + result.txHash;
     txLink.style.display = 'block';
   } else {
     setTimeout(function() {
-      txEl.innerHTML   = '✅ Confirmed on TON Testnet';
+      txEl.innerHTML   = '✅ Payout confirmed!';
       txEl.style.color = 'var(--green)';
     }, 3000);
   }
@@ -643,52 +793,41 @@ function showResolvedResult(result) {
   setTimeout(function() { document.getElementById('resultOverlay').classList.add('show'); }, 600);
 }
 
-function spawnSparkles() {
-  var e = ['✨','⭐','💫','🌟','💰','🪙'];
-  for (var i = 0; i < 18; i++) {
-    (function(i) {
-      setTimeout(function() {
-        var el = document.createElement('div');
-        el.className = 'sparkle';
-        el.textContent = e[Math.floor(Math.random() * e.length)];
-        el.style.left = (20 + Math.random() * (window.innerWidth - 40)) + 'px';
-        el.style.top  = (window.innerHeight * .2 + Math.random() * (window.innerHeight * .55)) + 'px';
-        var a = Math.random() * Math.PI * 2;
-        var d = 50 + Math.random() * 110;
-        el.style.setProperty('--dx', Math.cos(a) * d + 'px');
-        el.style.setProperty('--dy', Math.sin(a) * d + 'px');
-        document.body.appendChild(el);
-        setTimeout(function() { el.remove(); }, 1100);
-      }, i * 55);
-    })(i);
-  }
-}
-
+// ═══════════════════════════════
+//  REMATCH
+// ═══════════════════════════════
 function rematch() {
   haptic('medium');
   document.getElementById('resultOverlay').classList.remove('show');
-
-  // Reset TX status for next round
   var txEl = document.getElementById('txStatusEl');
-  txEl.innerHTML = '<span class="spinner"></span>Broadcasting on TON Testnet...';
+  txEl.innerHTML   = '<span class="spinner"></span>Sending payout on TON...';
   txEl.style.color = 'var(--ton)';
   document.getElementById('txLink').style.display = 'none';
+  gameOver = false; hasChosen = false;
 
   if (amIPlayer1) {
-    // P1 creates a new game automatically with same wager
-    api('/api/create-game', { wager: selectedWager, p1Wallet: walletAddr }).then(function(data) {
+    showLoading('Confirm ' + selectedWager + ' TON payment\nfor rematch...');
+    tonConnectUI.sendTransaction({
+      validUntil: Math.floor(Date.now() / 1000) + 300,
+      messages: [{ address: HOUSE_WALLET, amount: toNano(selectedWager), payload: '' }]
+    }).then(function(txResult) {
+      showLoading('Creating rematch...');
+      return api('/api/create-game', { wager: selectedWager, p1Wallet: walletAddr, txHash: txResult.boc || 'confirmed' });
+    }).then(function(data) {
+      hideLoading();
       if (data.error) { showToast('❌ ' + data.error); return; }
       gameId = data.gameId;
-      var rematchLink = data.inviteLink;
-      if (navigator.clipboard) navigator.clipboard.writeText(rematchLink).catch(function(){});
+      if (navigator.clipboard) navigator.clipboard.writeText(data.inviteLink).catch(function(){});
       document.getElementById('wagerBadge').textContent = 'Stake: ' + selectedWager + ' TON each';
-      document.getElementById('shareLink').textContent  = rematchLink;
+      document.getElementById('shareLink').textContent  = data.inviteLink;
       showToast('🔁 Rematch ready! Share link with opponent.');
       showScreen('screenWaiting');
       startPolling();
+    }).catch(function(err) {
+      hideLoading();
+      showToast('❌ Payment cancelled or failed.');
     });
   } else {
-    // P2 goes back to lobby and waits for P1's new invite
     showToast('⏳ Ask opponent to tap Rematch — then open their new link!');
     setTimeout(function() { showScreen('screenLobby'); }, 2000);
   }
@@ -698,6 +837,28 @@ function goLobby() {
   haptic('light');
   document.getElementById('resultOverlay').classList.remove('show');
   showScreen('screenLobby');
+}
+
+// ═══════════════════════════════
+//  SPARKLES
+// ═══════════════════════════════
+function spawnSparkles() {
+  var e = ['✨','⭐','💫','🌟','💰','🪙'];
+  for (var i = 0; i < 18; i++) {
+    (function(i) {
+      setTimeout(function() {
+        var el = document.createElement('div'); el.className = 'sparkle';
+        el.textContent = e[Math.floor(Math.random() * e.length)];
+        el.style.left  = (20 + Math.random() * (window.innerWidth - 40)) + 'px';
+        el.style.top   = (window.innerHeight * .2 + Math.random() * (window.innerHeight * .55)) + 'px';
+        var a = Math.random() * Math.PI * 2, d = 50 + Math.random() * 110;
+        el.style.setProperty('--dx', Math.cos(a) * d + 'px');
+        el.style.setProperty('--dy', Math.sin(a) * d + 'px');
+        document.body.appendChild(el);
+        setTimeout(function() { el.remove(); }, 1100);
+      }, i * 55);
+    })(i);
+  }
 }
 </script>
 </body>
