@@ -3,14 +3,10 @@
 // POST { gameId }
 // Returns { winner, goldBox, winnerReceives, housePaid, txHash }
 
-const { Redis } = require('@upstash/redis');
-const kv = new Redis({
-  url: process.env.KV_REST_API_URL,
-  token: process.env.KV_REST_API_TOKEN,
-});
+const { kv } = require('@vercel/kv');
 
-// TON testnet endpoint
-const TON_ENDPOINT = 'https://testnet.toncenter.com/api/v2';
+// TON mainnet endpoint
+const TON_ENDPOINT = 'https://toncenter.com/api/v2';
 const TON_API_KEY  = process.env.TON_API_KEY || ''; // optional but reduces rate limits
 
 const HOUSE_PCT   = 0.20; // 20% of loser's stake → house
