@@ -339,8 +339,8 @@ body{display:flex;flex-direction:column;align-items:center;
       <span class="spinner"></span>Broadcasting on TON Testnet...
     </div>
     <a id="txLink" class="tx-link" href="#" target="_blank" style="display:none;">View tx on testnet.tonscan.org ↗</a>
-    <button class="btn-gold" onclick="playAgain()" style="margin-top:4px;">⚔ Play Again</button>
-    <button class="btn-outline" onclick="goLobby()">← New Game</button>
+    <button class="btn-gold" id="btnRematch" onclick="rematch()" style="margin-top:4px;">⚔ Rematch — Same Opponent</button>
+    <button class="btn-outline" onclick="goLobby()">← New Game / Change Wager</button>
   </div>
 </div>
 
@@ -664,11 +664,34 @@ function spawnSparkles() {
   }
 }
 
-function playAgain() {
+function rematch() {
   haptic('medium');
   document.getElementById('resultOverlay').classList.remove('show');
-  showToast('Create a new game to play again!');
-  setTimeout(function() { showScreen('screenLobby'); }, 400);
+
+  // Reset TX status for next round
+  var txEl = document.getElementById('txStatusEl');
+  txEl.innerHTML = '<span class="spinner"></span>Broadcasting on TON Testnet...';
+  txEl.style.color = 'var(--ton)';
+  document.getElementById('txLink').style.display = 'none';
+
+  if (amIPlayer1) {
+    // P1 creates a new game automatically with same wager
+    api('/api/create-game', { wager: selectedWager, p1Wallet: walletAddr }).then(function(data) {
+      if (data.error) { showToast('❌ ' + data.error); return; }
+      gameId = data.gameId;
+      var rematchLink = data.inviteLink;
+      if (navigator.clipboard) navigator.clipboard.writeText(rematchLink).catch(function(){});
+      document.getElementById('wagerBadge').textContent = 'Stake: ' + selectedWager + ' TON each';
+      document.getElementById('shareLink').textContent  = rematchLink;
+      showToast('🔁 Rematch ready! Share link with opponent.');
+      showScreen('screenWaiting');
+      startPolling();
+    });
+  } else {
+    // P2 goes back to lobby and waits for P1's new invite
+    showToast('⏳ Ask opponent to tap Rematch — then open their new link!');
+    setTimeout(function() { showScreen('screenLobby'); }, 2000);
+  }
 }
 
 function goLobby() {
