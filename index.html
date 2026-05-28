@@ -650,45 +650,7 @@ async function chooseBox(idx) {
     startPolling();
   }
 }
-  haptic('light');
-
-  const playerNum = amIPlayer1 ? 1 : 2;
-  const cls       = amIPlayer1 ? 'bc1' : 'bc2';
-  const dotId     = 'd' + idx + (amIPlayer1 ? 'p1' : 'p2');
-
-  document.getElementById('box'+idx).classList.add(cls);
-  document.getElementById(dotId).classList.add('filled');
-
-  // Mark player tag
-  const myTag = document.getElementById(amIPlayer1?'pt1':'pt2');
-  myTag.classList.remove('active'); myTag.classList.add('chosen');
-
-  myTurn = false;
-  setLog(amIPlayer1 ? '✅ Box '+(idx===0?'I':'II')+' chosen — waiting for opponent...' : '✅ Box '+(idx===0?'I':'II')+' chosen — resolving...');
-  updateTurnBanner();
-
-  // Disable boxes
-  document.getElementById('box0').classList.add('disabled');
-  document.getElementById('box1').classList.add('disabled');
-
-  // Submit choice to backend
-  const data = await api('/api/submit-choice', { gameId, wallet: walletAddr, choice: idx });
-  if (data.error) { showToast('❌ ' + data.error); return; }
-
-  if (data.ready) {
-    // Both chosen — P1 resolves
-    if (amIPlayer1) {
-      const result = await api('/api/resolve-game', { gameId });
-      showResolvedResult(result);
-    } else {
-      setLog('⏳ Resolving on-chain...');
-      startPolling(); // wait for P1 to resolve
-    }
-  } else {
-    // Still waiting for other player
-    startPolling();
-  }
-}
+ 
 
 function showResolvedResult(result) {
   clearInterval(pollTimer);
