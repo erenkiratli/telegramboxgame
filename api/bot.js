@@ -80,7 +80,7 @@ module.exports = async function handler(req, res) {
           `💎 Wagers: 5 · 10 · 25 · 50 · 100 TON\n` +
           `🏆 Winner gets: own stake + 80% of loser's\n` +
           `🏛 House fee: 20% of loser's stake\n\n` +
-          `Tap below to play on TON Testnet:`,
+          `Tap below to play on TON Mainnet:`,
           {
             inline_keyboard: [[{
               text: '⚔️ Open Gold Box Duel',
