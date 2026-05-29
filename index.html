@@ -663,9 +663,7 @@ function startPolling() {
       }
       if (status.status === 'active' && status.p1Choice !== null && status.p2Choice !== null && amIPlayer1) {
         clearInterval(pollTimer);
-        api('/api/resolve-game', { gameId: gameId }).then(function(result) {
-          showResolvedResult(result);
-        });
+        resolveWithRetry(0);
       }
     });
   }, 2000);
@@ -732,11 +730,9 @@ function chooseBox(idx) {
     }
     if (data.ready) {
       if (amIPlayer1) {
-        api('/api/resolve-game', { gameId: gameId }).then(function(result) {
-          showResolvedResult(result);
-        });
+        resolveWithRetry(0);
       } else {
-        setLog('⏳ Resolving on-chain...');
+        setLog('⏳ Verifying payments on blockchain...');
         startPolling();
       }
     } else {
@@ -748,6 +744,26 @@ function chooseBox(idx) {
 // ═══════════════════════════════
 //  RESULT
 // ═══════════════════════════════
+// Auto-retry resolve until both payments confirmed on blockchain
+function resolveWithRetry(attempt) {
+  var maxAttempts = 20; // 20 x 5s = up to 100 seconds wait
+  if (attempt >= maxAttempts) {
+    showToast('❌ Payment verification timed out. Contact support.');
+    return;
+  }
+  setLog('⏳ Verifying payments on blockchain... (' + (attempt + 1) + ')');
+  api('/api/resolve-game', { gameId: gameId }).then(function(result) {
+    if (result && result.retryable) {
+      // Payments not confirmed yet — wait 5s and retry
+      setTimeout(function() { resolveWithRetry(attempt + 1); }, 5000);
+    } else {
+      showResolvedResult(result);
+    }
+  }).catch(function() {
+    setTimeout(function() { resolveWithRetry(attempt + 1); }, 5000);
+  });
+}
+
 function showResolvedResult(result) {
   clearInterval(pollTimer);
   if (!result || result.error) { showToast('❌ Error resolving game'); return; }
